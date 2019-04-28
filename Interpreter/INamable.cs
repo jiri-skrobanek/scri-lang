@@ -8,4 +8,10 @@ namespace Interpreter
     {
         String Name { get; set; }
     }
+
+    public class NameCollection
+    {
+        public Variable variable = null;
+        public Function[] functions = new Function[256];
+    }
 }

@@ -4,15 +4,15 @@ using System.Text;
 
 namespace Interpreter
 {
-    abstract class Statement : IExecutable
+    public abstract class Statement : IExecutable
     {
         public abstract ExecutionResult Execute(Scope scope);
     }
 
-    class Assignment : Statement
+    public class Assignment : Statement
     {
         Variable variable;
-        Expression expression;
+        IExpression expression;
 
         public override ExecutionResult Execute(Scope scope)
         {
@@ -21,9 +21,9 @@ namespace Interpreter
         }
     }
 
-    class Conditional : Statement
+    public class Conditional : Statement
     {
-        Expression condition;
+        IExpression condition;
         Block satisfied;
         Block unsatisfied;
 
@@ -40,10 +40,10 @@ namespace Interpreter
         }
     }
 
-    class WhileLoop : Statement
+    public class WhileLoop : Statement
     {
-        Expression condition;
-        Block block;
+        public IExpression condition;
+        public Block block;
 
         public override ExecutionResult Execute(Scope scope)
         {
@@ -60,9 +60,9 @@ namespace Interpreter
         }
     }
 
-    class ReturnStatement : Statement
+    public class ReturnStatement : Statement
     {
-        Expression expression;
+        public IExpression expression;
 
         public override ExecutionResult Execute(Scope scope)
         {
@@ -70,7 +70,7 @@ namespace Interpreter
         }
     }
 
-    class BreakStatement : Statement
+    public class BreakStatement : Statement
     {
         public override ExecutionResult Execute(Scope scope)
         {
@@ -78,7 +78,7 @@ namespace Interpreter
         }
     }
 
-    class ContinueStatement : Statement
+    public class ContinueStatement : Statement
     {
         public override ExecutionResult Execute(Scope scope)
         {
@@ -86,7 +86,7 @@ namespace Interpreter
         }
     }
 
-    class CallStatement : Statement
+    public class CallStatement : Statement
     {
         public override ExecutionResult Execute(Scope scope)
         {

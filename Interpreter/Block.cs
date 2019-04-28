@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Interpreter
 {
-    class Block : IExecutable
+    public class Block : IExecutable
     {
         List<Statement> statements;
 
@@ -13,8 +13,19 @@ namespace Interpreter
             Scope myScope = new Scope() { ParentScope = s };
             foreach(Statement stat in statements)
             {
-                stat.Execute(myScope);
+                var result = stat.Execute(myScope);
+                switch (result.resultType)
+                {
+                    case ResultType.Break:
+                    case ResultType.Continue:
+                    case ResultType.Return:
+                    case ResultType.Error:
+                        return result;
+                    case ResultType.Performed:
+                        continue;
+                }
             }
+            return new PerformedResult();
         }
     }
 }

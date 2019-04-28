@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Interpreter
 {
-    class Function : INamable
+    public class Function : INamable, ICallable
     {
         public String Name { get; set; }
         public List<String> Arguments;
@@ -19,18 +19,21 @@ namespace Interpreter
 
             for (int i = 0; i < Arguments.Count; i++, en.MoveNext())
             {
-                var v = new Variable() { value = en.Current };
-                s.Names.Add(Arguments[i], v);
+                s.AssignValue(Arguments[i], en.Current);
             }
 
             var execr = body.Execute(s);
-            if (execr.GetType() == typeof(ReturnResult))
+            if (execr.resultType == ResultType.Return)
             {
                 result = (execr as ReturnResult).result;
             }
-            else
+            else if(execr.resultType == ResultType.Performed)
             {
                 result = null;
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
         }
     }

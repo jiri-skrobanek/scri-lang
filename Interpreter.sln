@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interpreter", "Interpreter\Interpreter.csproj", "{C5B35628-8B55-44BA-8ADF-5829A50E49DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Interpreter", "Interpreter\Interpreter.csproj", "{C5B35628-8B55-44BA-8ADF-5829A50E49DF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testing", "Testing\Testing.csproj", "{E1EE1BBD-E1E0-4A00-968A-ABC673FABEAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csproj", "{E9730DE5-B3FC-407B-92C8-7F39910BD839}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{C5B35628-8B55-44BA-8ADF-5829A50E49DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5B35628-8B55-44BA-8ADF-5829A50E49DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5B35628-8B55-44BA-8ADF-5829A50E49DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1EE1BBD-E1E0-4A00-968A-ABC673FABEAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1EE1BBD-E1E0-4A00-968A-ABC673FABEAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1EE1BBD-E1E0-4A00-968A-ABC673FABEAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1EE1BBD-E1E0-4A00-968A-ABC673FABEAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9730DE5-B3FC-407B-92C8-7F39910BD839}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9730DE5-B3FC-407B-92C8-7F39910BD839}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9730DE5-B3FC-407B-92C8-7F39910BD839}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9730DE5-B3FC-407B-92C8-7F39910BD839}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

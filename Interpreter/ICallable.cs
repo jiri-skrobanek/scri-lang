@@ -4,10 +4,8 @@ using System.Text;
 
 namespace Interpreter
 {
-    public class Variable : INamable
+    interface ICallable
     {
-        public Value value;
-
-        public string Name { get; set; }
+        void Call(IEnumerable<Value> Args, out Value Result);
     }
 }

@@ -4,10 +4,8 @@ using System.Text;
 
 namespace Interpreter
 {
-    public class Variable : INamable
+    public enum ValueKind
     {
-        public Value value;
-
-        public string Name { get; set; }
+        Integral, Char
     }
 }
