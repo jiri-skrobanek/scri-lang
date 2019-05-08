@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Interpreter;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,6 +10,13 @@ namespace Parser
         object Token { get; set; }
     }
 
+    public class ParsedExpression : IToken
+    {
+        public object Token { get; set; }
+
+        public IExpression expression;
+    }
+
     class Operator : IToken
     {
         public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -17,15 +25,15 @@ namespace Parser
         {
             switch(Symbol)
             {
-                case '+': @operator = OperatorToken.Plus; break;
-                case '-': @operator = OperatorToken.Plus; break;
-                case '*': @operator = OperatorToken.Prod; break;
-                case '/': @operator = OperatorToken.Div; break;
-                case '=': @operator = OperatorToken.Equals; break;
+                case '+': @operator = OperatorType.Plus; break;
+                case '-': @operator = OperatorType.Plus; break;
+                case '*': @operator = OperatorType.Prod; break;
+                case '/': @operator = OperatorType.Div; break;
+                case '=': @operator = OperatorType.Equals; break;
             }
         }
 
-        public OperatorToken @operator;
+        public OperatorType @operator;
     }
 
     class ClosingBracket : IToken
@@ -38,7 +46,7 @@ namespace Parser
         public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
-    class WordToken : IToken
+    abstract class WordToken : IToken
     {
         public static WordToken NewWord(string word)
         {

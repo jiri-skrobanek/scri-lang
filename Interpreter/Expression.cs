@@ -46,8 +46,9 @@ namespace Interpreter
 
     public class OperatorEvaluation : IExpression
     {
-        public Operator @operator;
-        public List<IExpression> args;
+        public OperatorType @operator;
+        public IExpression left_arg;
+        public IExpression right_arg;
 
         public Value Evaluate(Scope scope)
         {

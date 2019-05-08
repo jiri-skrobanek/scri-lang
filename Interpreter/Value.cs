@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Interpreter
 {
-    public class Value
+    public abstract class Value
     {
         public ValueKind valueKind;
 
