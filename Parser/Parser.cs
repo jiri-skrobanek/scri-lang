@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Interpreter;
+using System.Linq;
 using System.Text;
 
 namespace Parser
@@ -9,11 +10,54 @@ namespace Parser
     {
         public static Block ParseCode(String Code)
         {
-            GetTokens(Code);
-
+            var block = new Block() { statements = new List<Statement>() };
+            foreach(var st in GetStatements(Code))
+            {
+                if(st[0].GetType() != typeof(ReservedWord))
+                {
+                    throw new Exception("Invalid statement");
+                }
+                var first_word = (st[0] as ReservedWord);
+                switch(first_word.Word)
+                {
+                    case "if":
+                    case "return":
+                    case "print": block.statements.Append(new PrintStatement(Parse(st.GetRange(1,st.Count-1)))); break;
+                    default: throw new Exception("This is technically unreachable");
+                }
+            }
+            return block;
         }
 
-        public static IList<IToken> GetTokens(String Code)
+        private static IEnumerable<List<IToken>> GetStatements(string Code)
+        {
+            List<List<IToken>> statements = new List<List<IToken>>();
+            int bracket_index = 0;
+            int begin_index = 0;
+            for(int i = 0; i < Code.Length; i++)
+            {
+                if (Code[i] == ';' && bracket_index == 0)
+                {
+                    statements.Add(GetTokens(Code.Substring(begin_index, i - begin_index)));
+                    begin_index = i + 1;
+                }
+                else if(Code[i] == ')')
+                {
+                    bracket_index++;
+                }
+                else if(Code[i] == '(')
+                {
+                    bracket_index--;
+                }
+            }
+            if(!string.IsNullOrWhiteSpace( Code.Substring(begin_index)))
+            {
+                throw new Exception("Statement not terminated by ';'.");
+            }
+            return from x in Code.Split(';') select GetTokens(x);
+        }
+
+        public static List<IToken> GetTokens(String Code)
         {
             List<IToken> tokens = new List<IToken>();
 

@@ -11,12 +11,12 @@ namespace Interpreter
 
     public class Assignment : Statement
     {
-        Variable variable;
+        String variable;
         IExpression expression;
 
         public override ExecutionResult Execute(Scope scope)
         {
-            variable.value = expression.Evaluate(scope);
+            scope.AssignValue(variable, expression.Evaluate(scope));
             return new PerformedResult();
         }
     }
@@ -86,11 +86,45 @@ namespace Interpreter
         }
     }
 
+    public class PrintStatement : Statement
+    {
+        IExpression expression;
+
+        public PrintStatement(IExpression expression)
+        {
+            this.expression = expression;
+        }
+
+        public override ExecutionResult Execute(Scope scope)
+        {
+            var value = expression.Evaluate(scope);
+            if(value.ValueKind == ValueKind.Integral)
+            {
+                Console.WriteLine(((IntegralValue)value).value);
+            }
+            else if (value.ValueKind == ValueKind.Char)
+            {
+                Console.WriteLine(((CharValue)value).value);
+            }
+            
+            return new PerformedResult();
+        }
+    }
+
     public class CallStatement : Statement
     {
         public override ExecutionResult Execute(Scope scope)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class FunctionDefinition : Statement
+    {
+        public override ExecutionResult Execute(Scope scope)
+        {
+            scope.AssignValue(); 
+            return new PerformedResult();
         }
     }
 }

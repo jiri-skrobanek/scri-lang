@@ -6,7 +6,7 @@ namespace Interpreter
 {
     public class Block : IExecutable
     {
-        List<Statement> statements;
+        public IEnumerable<Statement> statements;
 
         public ExecutionResult Execute(Scope s)
         {

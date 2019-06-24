@@ -6,6 +6,6 @@ namespace Interpreter
 {
     public enum ValueKind
     {
-        Integral, Char
+        Integral, Char, None, Function
     }
 }

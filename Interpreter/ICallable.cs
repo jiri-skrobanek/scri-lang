@@ -6,6 +6,6 @@ namespace Interpreter
 {
     interface ICallable
     {
-        void Call(IEnumerable<Value> Args, out Value Result);
+        void Call(IEnumerable<IValue> Args, out IValue Result);
     }
 }

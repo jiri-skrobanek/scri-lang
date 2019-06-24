@@ -7,14 +7,14 @@ namespace Interpreter
 {
     public interface IExpression
     {
-        Value Evaluate(Scope scope);
+        IValue Evaluate(Scope scope);
     }
 
     public class ConstantExpression : IExpression
     {
-        public Value value;
+        public IValue value;
 
-        public Value Evaluate(Scope scope)
+        public IValue Evaluate(Scope scope)
         {
             return value;
         }
@@ -24,9 +24,9 @@ namespace Interpreter
     {
         public String variableName;
 
-        public Value Evaluate(Scope scope)
+        public IValue Evaluate(Scope scope)
         {
-            return scope.FindVariable(variableName).value;
+            return scope[variableName];
         }
     }
 
@@ -36,10 +36,10 @@ namespace Interpreter
         public byte ArgCount { get { return (byte)args.Count; } }
         public List<IExpression> args;
 
-        public Value Evaluate(Scope scope)
+        public IValue Evaluate(Scope scope)
         {
             var processed = from arg in args select arg.Evaluate(scope);
-            scope.FindFunction(functionName, ArgCount).Call(processed, out var result);
+            (scope[functionName] as ICallable).Call(processed, out var result);
             return result;
         }
     }
@@ -50,10 +50,12 @@ namespace Interpreter
         public IExpression left_arg;
         public IExpression right_arg;
 
-        public Value Evaluate(Scope scope)
+        public IValue Evaluate(Scope scope)
         {
-            var processed = from arg in args select arg.Evaluate(scope);
-            @operator.Call(processed, out var result);
+            var processed_l = left_arg.Evaluate(scope);
+            var processed_r = left_arg.Evaluate(scope);
+            var op = Operator.
+            @operator.Call(processed_l, processed_r, out var result);
             return result;
         }
     }

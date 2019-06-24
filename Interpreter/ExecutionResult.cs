@@ -30,7 +30,7 @@ namespace Interpreter
             resultType = ResultType.Return;
         }
 
-        public Value result;
+        public IValue result;
     }
 
     class BreakResult : ExecutionResult
