@@ -39,7 +39,7 @@ namespace Interpreter
         public IValue Evaluate(Scope scope)
         {
             var processed = from arg in args select arg.Evaluate(scope);
-            (scope[functionName] as ICallable).Call(processed, out var result);
+            (scope[functionName] as ICallable).Call(processed.ToList(), out var result);
             return result;
         }
     }
@@ -53,10 +53,9 @@ namespace Interpreter
         public IValue Evaluate(Scope scope)
         {
             var processed_l = left_arg.Evaluate(scope);
-            var processed_r = left_arg.Evaluate(scope);
-            var op = Operator.
-            @operator.Call(processed_l, processed_r, out var result);
-            return result;
+            var processed_r = right_arg.Evaluate(scope);
+            var application = Operator.GetApplication(@operator, processed_l.ValueKind, processed_r.ValueKind);
+            return application(processed_l, processed_r);
         }
     }
 }

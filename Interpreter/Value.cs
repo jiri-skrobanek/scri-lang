@@ -19,6 +19,11 @@ namespace Interpreter
         {
             return false;
         }
+
+        public override string ToString()
+        {
+            return "None";
+        }
     }
 
     public struct IntegralValue : IValue
@@ -35,6 +40,11 @@ namespace Interpreter
         public bool GetTruthValue()
         {
             return this;
+        }
+
+        public override string ToString()
+        {
+            return value.ToString();
         }
 
         #region Conversion Operators
@@ -61,32 +71,42 @@ namespace Interpreter
 
         public static IntegralValue operator +(IntegralValue l, IntegralValue r)
         {
-            return l + r;
+            return l.value + r.value;
         }
 
         public static IntegralValue operator -(IntegralValue l, IntegralValue r)
         {
-            return l - r;
+            return l.value - r.value;
         }
 
         public static IntegralValue operator *(IntegralValue l, IntegralValue r)
         {
-            return l * r;
+            return l.value * r.value;
         }
 
         public static IntegralValue operator /(IntegralValue l, IntegralValue r)
         {
-            return l / r;
+            return l.value / r.value;
         }
 
-        public static bool operator >(IntegralValue l, IntegralValue r)
+        public static IntegralValue operator >(IntegralValue l, IntegralValue r)
         {
-            return l > r;
+            return l.value > r.value;
         }
 
-        public static bool operator <(IntegralValue l, IntegralValue r)
+        public static IntegralValue operator <(IntegralValue l, IntegralValue r)
         {
-            return l < r;
+            return l.value < r.value;
+        }
+
+        public static IntegralValue operator ==(IntegralValue l, IntegralValue r)
+        {
+            return l.value == r.value;
+        }
+
+        public static IntegralValue operator !=(IntegralValue l, IntegralValue r)
+        {
+            return !(l == r);
         }
 
         #endregion
@@ -106,6 +126,11 @@ namespace Interpreter
             return value != 0;
         }
 
+        public override string ToString()
+        {
+            return value.ToString();
+        }
+
         public ValueKind ValueKind { get { return ValueKind.Char; } }
     }
 
@@ -122,7 +147,9 @@ namespace Interpreter
             this.creation_scope = creation_scope;
         }
 
-        public void Call(IEnumerable<IValue> Args, out IValue result)
+        public Invocation Call { get { return _call; } }
+
+        void _call(IList<IValue> Args, out IValue result)
         {
             var en = Args.GetEnumerator();
 
@@ -153,6 +180,174 @@ namespace Interpreter
             return true;
         }
 
+        public override string ToString()
+        {
+            return "Function";
+        }
+
         public ValueKind ValueKind { get { return ValueKind.Function; } }
+    }
+
+    public class Vector : IValue, ICallable
+    {
+        private List<IValue> items = new List<IValue>();
+
+        public Vector(IList<IValue> Args)
+        {
+            items.AddRange(Args);
+        }
+
+        public Invocation Call { get { return _call; } }
+
+        void _call(IList<IValue> Args, out IValue result)
+        {
+            var len = Args.Count;
+            if(len == 1)
+            {
+                if (Args[0] is IntegralValue)
+                {
+                    int Index = (IntegralValue)Args[0];
+                    if(Index < items.Count)
+                    {
+                        result = items[Index];
+                    }
+                    else
+                    {
+                        result = new None();
+                    }
+                }
+                else
+                {
+                    throw new Exception("Invalid list manipulation exception.");
+                }
+            }
+            else if (len==2)
+            {
+                if (Args[0] is IntegralValue)
+                {
+                    result = new None();
+                    int Index = (IntegralValue)Args[0];
+                    if (Index < 0)
+                    {
+                        if(Index != -1)
+                        {
+                            throw new Exception("Invalid list manipulation exception.");
+                        }
+                        items.Add(Args[1]);
+                    }
+                    else
+                    {
+                        if (items.Count > Index)
+                        {
+                            items[Index] = Args[1];
+
+                            // Remove Nones from the end:
+                            while (items.Count > 0 && items[items.Count - 1] is None)
+                            {
+                                items.RemoveAt(items.Count - 1);
+                            }
+                        }
+                        else if(!(Args[1] is None))
+                        {
+                            while(items.Count < Index)
+                            {
+                                items.Add(new None());
+                            }
+                            items.Add(Args[1]);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Invalid list manipulation exception.");
+                }
+            }
+            else
+            {
+                throw new Exception("Invalid list manipulation exception.");
+            }
+        }
+
+        public bool GetTruthValue()
+        {
+            return items.Count > 0;
+        }
+
+        public override string ToString()
+        {
+            return "Vector";
+        }
+
+        public ValueKind ValueKind { get { return ValueKind.Vector; } }
+    }
+
+    public class Map : IValue, ICallable
+    {
+        private Dictionary<IValue,IValue> items = new Dictionary<IValue, IValue>();
+
+        public Invocation Call { get { return _call; } }
+
+        void _call(IList<IValue> Args, out IValue result)
+        {
+            var len = Args.Count;
+            if (len == 1)
+            {
+                if (Args[0] is IntegralValue)
+                {
+                    if (items.ContainsKey(Args[1]))
+                    {
+                        result = items[(IntegralValue)Args[0]];
+                    }
+                    else
+                    {
+                        result = new None();
+}
+                }
+                else
+                {
+                    throw new Exception("Invalid map manipulation exception.");
+                }
+            }
+            else if (len == 2)
+            {
+                result = new None();
+                if (Args[1] is None)
+                {
+                    items.Remove(Args[0]);
+                }
+                else
+                {
+                    items[Args[0]] = Args[1];
+                }
+            }
+            else
+            {
+                throw new Exception("Invalid map manipulation exception.");
+            }
+        }
+
+        public bool GetTruthValue()
+        {
+            return items.Count > 0;
+        }
+
+        public override string ToString()
+        {
+            return "Vector";
+        }
+
+        public ValueKind ValueKind { get { return ValueKind.Vector; } }
+    }
+
+    public class Buildin : IValue, ICallable
+    {
+        public ValueKind ValueKind { get { return ValueKind.Buildin; } }
+
+        public Invocation Call { get; set; }
+
+        public bool GetTruthValue()
+        {
+            return true;
+        }
     }
 }

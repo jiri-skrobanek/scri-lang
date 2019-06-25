@@ -29,7 +29,9 @@ namespace Interpreter
             this.type = type;
         }
 
-        public void Call(IEnumerable<IValue> Args, out IValue Result)
+        public Invocation Call { get { return _call; } }
+
+        void _call(IEnumerable<IValue> Args, out IValue Result)
         {
             var en = Args.GetEnumerator(); en.MoveNext();
             var first = en.Current;
@@ -37,7 +39,8 @@ namespace Interpreter
             Result = GetApplication(type, operand1, operand2)(first, second);
         }
 
-        private static readonly OpDict Operators = new OpDict {
+        private static readonly OpDict Operators = new OpDict
+        {
 
             // Intergral Operators:
 
@@ -45,15 +48,18 @@ namespace Interpreter
             [(OperatorType.Minus, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return (IntegralValue)x - (IntegralValue)y; },
             [(OperatorType.Prod, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return (IntegralValue)x * (IntegralValue)y; },
             [(OperatorType.Div, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return (IntegralValue)x / (IntegralValue)y; },
-            [(OperatorType.Greater, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return (IntegralValue)((IntegralValue)x > (IntegralValue)y); },
-            [(OperatorType.Lesser, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return (IntegralValue)((IntegralValue)x < (IntegralValue)y); },
-            [(OperatorType.And, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return 0 != (((IntegralValue)x).value * ((IntegralValue)y).value); },
-            [(OperatorType.Or, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return new IntegralValue((x as IntegralValue).value / (y as IntegralValue).value); },
+            [(OperatorType.Greater, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return ((IntegralValue)x > (IntegralValue)y); },
+            [(OperatorType.Lesser, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return (IntegralValue)x < (IntegralValue)y; },
+            [(OperatorType.Equals, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return ((IntegralValue)x == (IntegralValue)y); },
+            [(OperatorType.NEQ, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return (IntegralValue)x != (IntegralValue)y; },
+            [(OperatorType.And, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return new IntegralValue(0 == (IntegralValue)x || 0 == (IntegralValue)y ? 0 : 1); },
+            [(OperatorType.Or, ValueKind.Integral, ValueKind.Integral)] = (x, y) => { return new IntegralValue(0 == (IntegralValue)x && 0 == (IntegralValue)y ? 0 : 1); },
         };
 
         public static OperatorApplication GetApplication(OperatorType type, ValueKind? left, ValueKind? right)
         {
-            try {
+            try
+            {
                 return Operators[(type, left, right)];
             }
             catch (KeyNotFoundException)
@@ -61,15 +67,5 @@ namespace Interpreter
                 throw new Exception("Operator cannot be used with these types of operands.");
             }
         }
-    }
-    
-
-    public static class BuildinIntegralOperators
-    {
-        /*
-        public static Operator plus = new Operator(2, ValueKind.Integral, ValueKind.Integral, (x, y) => { return new IntegralValue((x as IntegralValue).value + (y as IntegralValue).value); } );
-        public static Operator times = new Operator(2, ValueKind.Integral, ValueKind.Integral, (x, y) => { return new IntegralValue((x as IntegralValue).value * (y as IntegralValue).value); });
-        public static Operator minus = new Operator(2, ValueKind.Integral, ValueKind.Integral, (x, y) => { return new IntegralValue((x as IntegralValue).value - (y as IntegralValue).value); });
-        */
     }
 }

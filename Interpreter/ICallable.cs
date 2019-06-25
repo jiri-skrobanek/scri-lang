@@ -4,8 +4,10 @@ using System.Text;
 
 namespace Interpreter
 {
+    public delegate void Invocation(IList<IValue> Args, out IValue Result);
+
     interface ICallable
     {
-        void Call(IEnumerable<IValue> Args, out IValue Result);
+        Invocation Call { get; }
     }
 }

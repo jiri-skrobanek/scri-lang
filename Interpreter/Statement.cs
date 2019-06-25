@@ -16,7 +16,7 @@ namespace Interpreter
 
         public override ExecutionResult Execute(Scope scope)
         {
-            scope.AssignValue(variable, expression.Evaluate(scope));
+            scope[variable] = expression.Evaluate(scope);
             return new PerformedResult();
         }
     }
@@ -98,15 +98,9 @@ namespace Interpreter
         public override ExecutionResult Execute(Scope scope)
         {
             var value = expression.Evaluate(scope);
-            if(value.ValueKind == ValueKind.Integral)
-            {
-                Console.WriteLine(((IntegralValue)value).value);
-            }
-            else if (value.ValueKind == ValueKind.Char)
-            {
-                Console.WriteLine(((CharValue)value).value);
-            }
-            
+
+            Environment.PrintText(value.ToString());
+
             return new PerformedResult();
         }
     }
@@ -121,9 +115,13 @@ namespace Interpreter
 
     public class FunctionDefinition : Statement
     {
+        List<String> Args;
+        Block Body;
+        String Name;
+
         public override ExecutionResult Execute(Scope scope)
         {
-            scope.AssignValue(); 
+            scope[Name] = new Function(Args, Body, scope);
             return new PerformedResult();
         }
     }
