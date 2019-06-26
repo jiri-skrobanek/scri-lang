@@ -4,6 +4,11 @@ using System.Text;
 
 namespace Interpreter
 {
+    interface IExecutable
+    {
+        ExecutionResult Execute(Scope s);
+    }
+
     public enum ResultType
     {
         Performed, Return, Break, Continue, Error

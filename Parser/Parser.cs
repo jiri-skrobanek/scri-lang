@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Parser
 {
-    public static class Parser
+    public static partial class Parser
     {
         public static Block ParseCode(String Code)
         {
@@ -29,6 +29,11 @@ namespace Parser
             return block;
         }
 
+        /// <summary>
+        /// Split code to statements
+        /// </summary>
+        /// <param name="Code">The code as string</param>
+        /// <returns>Collection of statements -- Lists of ITokens</returns>
         private static IEnumerable<List<IToken>> GetStatements(string Code)
         {
             List<List<IToken>> statements = new List<List<IToken>>();
@@ -78,10 +83,20 @@ namespace Parser
                     case '-':
                     case '/':
                     case '*':
+                    case '?':
+                    case '!':
+                    case '<':
+                    case '>':
                     case '=':
+                    case '&':
+                    case '|':
                         new_token(); tokens.Add(new Operator(Code[i])); break;
+                    case '#':
+                        new_token(); tokens.Add(new CharacterConstant(Code[++i])); break;
                     case ',':
                         new_token(); tokens.Add(new Separator()); break;
+                    case ';':
+                        new_token(); tokens.Add(new StatementTerminator()); break;
                     case char c: if (sb.Length == 0 && c >= 0 && c <= 9) read_numeric(ref i); else sb.Append(c); break;
                 }
             }

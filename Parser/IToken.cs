@@ -30,6 +30,11 @@ namespace Parser
                 case '*': @operator = OperatorType.Prod; break;
                 case '/': @operator = OperatorType.Div; break;
                 case '=': @operator = OperatorType.Equals; break;
+                case '<': @operator = OperatorType.Lesser; break;
+                case '>': @operator = OperatorType.Greater; break;
+                case '@': @operator = OperatorType.Greater; break;
+                case '?': @operator = OperatorType.Greater; break;
+                case '!': @operator = OperatorType.Greater; break;
             }
         }
 
@@ -79,6 +84,17 @@ namespace Parser
         public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
+    class CharacterConstant : IToken
+    {
+
+        public CharacterConstant(char c)
+        {
+            Token = c;
+        }
+
+        public object Token { get; set; }
+    }
+
     class ReservedWord : WordToken
     {
         public ReservedWord(string word)
@@ -109,6 +125,11 @@ namespace Parser
     }
 
     class Separator : IToken
+    {
+        public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    class StatementTerminator : IToken
     {
         public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }

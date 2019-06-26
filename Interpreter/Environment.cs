@@ -22,7 +22,7 @@ namespace Interpreter
             }
         };
 
-        #region Build-in function
+        #region Build-in functions
 
         private static void getNewVector(IList<IValue> Args, out IValue result)
         {
@@ -42,6 +42,6 @@ namespace Interpreter
             result = new Map();
         }
 
-        #endregion Build-in function
+        #endregion Build-in functions
     }
 }
