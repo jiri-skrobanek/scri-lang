@@ -26,15 +26,15 @@ namespace Parser
             switch(Symbol)
             {
                 case '+': @operator = OperatorType.Plus; break;
-                case '-': @operator = OperatorType.Plus; break;
+                case '-': @operator = OperatorType.Minus; break;
                 case '*': @operator = OperatorType.Prod; break;
                 case '/': @operator = OperatorType.Div; break;
-                case '=': @operator = OperatorType.Equals; break;
+                case '=': @operator = OperatorType.Assign; break;
                 case '<': @operator = OperatorType.Lesser; break;
                 case '>': @operator = OperatorType.Greater; break;
-                case '@': @operator = OperatorType.Greater; break;
-                case '?': @operator = OperatorType.Greater; break;
-                case '!': @operator = OperatorType.Greater; break;
+                case '@': @operator = OperatorType.FDef; break;
+                case '?': @operator = OperatorType.Equals; break;
+                case '!': @operator = OperatorType.NEQ; break;
             }
         }
 
@@ -132,5 +132,21 @@ namespace Parser
     class StatementTerminator : IToken
     {
         public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    /// <summary>
+    /// Contains the code inside parentheses split to statements.
+    /// </summary>
+    class BracketContent : IToken
+    {
+        public object Token { get; set; } = new List<List<IToken>>();
+    }
+
+    /// <summary>
+    /// Contains the list of arguments or expression.
+    /// </summary>
+    class ArgVector : IToken
+    {
+        public object Token { get; set; } = new List<IToken>();
     }
 }

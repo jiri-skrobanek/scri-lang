@@ -1,133 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using Interpreter;
-using System.Linq;
 using System.Text;
+using Interpreter;
 
 namespace Parser
 {
-    public static partial class Parser
+    public static partial class ParserFirstPhase
     {
-        public static Block ParseCode(String Code)
+        private static IExpression MakeExpression(List<IToken> tokens)
         {
-            var block = new Block() { statements = new List<Statement>() };
-            foreach(var st in GetStatements(Code))
+            if (tokens.Count == 0)
             {
-                if(st[0].GetType() != typeof(ReservedWord))
-                {
-                    throw new Exception("Invalid statement");
-                }
-                var first_word = (st[0] as ReservedWord);
-                switch(first_word.Word)
-                {
-                    case "if":
-                    case "return":
-                    case "print": block.statements.Append(new PrintStatement(Parse(st.GetRange(1,st.Count-1)))); break;
-                    default: throw new Exception("This is technically unreachable");
-                }
+                throw new Exception("Void expression");
             }
-            return block;
-        }
-
-        /// <summary>
-        /// Split code to statements
-        /// </summary>
-        /// <param name="Code">The code as string</param>
-        /// <returns>Collection of statements -- Lists of ITokens</returns>
-        private static IEnumerable<List<IToken>> GetStatements(string Code)
-        {
-            List<List<IToken>> statements = new List<List<IToken>>();
-            int bracket_index = 0;
-            int begin_index = 0;
-            for(int i = 0; i < Code.Length; i++)
-            {
-                if (Code[i] == ';' && bracket_index == 0)
-                {
-                    statements.Add(GetTokens(Code.Substring(begin_index, i - begin_index)));
-                    begin_index = i + 1;
-                }
-                else if(Code[i] == ')')
-                {
-                    bracket_index++;
-                }
-                else if(Code[i] == '(')
-                {
-                    bracket_index--;
-                }
-            }
-            if(!string.IsNullOrWhiteSpace( Code.Substring(begin_index)))
-            {
-                throw new Exception("Statement not terminated by ';'.");
-            }
-            return from x in Code.Split(';') select GetTokens(x);
-        }
-
-        public static List<IToken> GetTokens(String Code)
-        {
-            List<IToken> tokens = new List<IToken>();
-
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < Code.Length; i++)
-            {
-                switch (Code[i])
-                {
-                    case ' ':
-                    case '\n':
-                        new_token(); break;
-                    case '(':
-                        new_token(); tokens.Add(new OpeningBracket()); break;
-                    case ')':
-                        new_token(); tokens.Add(new ClosingBracket()); break;
-                    case '+':
-                    case '-':
-                    case '/':
-                    case '*':
-                    case '?':
-                    case '!':
-                    case '<':
-                    case '>':
-                    case '=':
-                    case '&':
-                    case '|':
-                        new_token(); tokens.Add(new Operator(Code[i])); break;
-                    case '#':
-                        new_token(); tokens.Add(new CharacterConstant(Code[++i])); break;
-                    case ',':
-                        new_token(); tokens.Add(new Separator()); break;
-                    case ';':
-                        new_token(); tokens.Add(new StatementTerminator()); break;
-                    case char c: if (sb.Length == 0 && c >= 0 && c <= 9) read_numeric(ref i); else sb.Append(c); break;
-                }
-            }
-
-            new_token();
-
-            return tokens;
-
-            void new_token()
-            {
-                if (sb.Length > 0)
-                {
-                    tokens.Add(WordToken.NewWord(sb.ToString())); sb.Clear();
-                }
-            }
-
-            void read_numeric(ref int index)
-            {
-                while (index < Code.Length && Code[index] >= 0 && Code[index] <= 9)
-                {
-                    sb.Append(Code[index++]);
-                }
-                tokens.Add(new NumericConstant(sb.ToString()));
-                sb.Clear();
-                index--;
-            }
-        }
-
-        private static IExpression Parse(List<IToken> tokens)
-        {
-            if (tokens.Count == 0) throw new Exception("Void expression");
 
             // Remove function calls and nested parentheses:
             List<IToken> simplified = new List<IToken>();
@@ -176,7 +61,10 @@ namespace Parser
             // Keep finding the highest priority operator:
             IExpression SplitByOperator(List<IToken> exp)
             {
-                if (exp.Count == 0) throw new Exception("Void expression");
+                if (exp.Count == 0)
+                {
+                    throw new Exception("Void expression");
+                }
                 else if (exp.Count == 1)
                 {
                     if (exp[0].GetType() == typeof(ParsedExpression))
@@ -228,7 +116,7 @@ namespace Parser
         /// </summary>
         /// <param name="list">Tokens must be with name and parentheses, i.d. in the form ["foo", "(", "a", ",", "b", ")"].</param>
         /// <returns></returns>
-        private static IToken ParseFunctionCall(List<IToken> list)
+        private static IToken ParseFunctionCall(, IList<IToken> list)
         {
             List<IExpression> arguments = new List<IExpression>();
             // Isolated arguments:
@@ -250,9 +138,20 @@ namespace Parser
                     bracket_index--;
                 }
             }
-            if(arg_begin < list.Count - 1) arguments.Add(Parse(list.GetRange(arg_begin, list.Count - 1 - arg_begin)));
+            if (arg_begin < list.Count - 1)
+            {
+                arguments.Add(Parse(list.GetRange(arg_begin, list.Count - 1 - arg_begin)));
+            }
+
             var expr = new FunctionCall { functionName = (list[0] as CustomWord).Word, args = arguments };
             return new ParsedExpression { expression = expr };
         }
+
+        private static Interpreter.FunctionDefinition MakeFunctionDefinition(IList<IToken> tokens) { }
+
+        private static Assignment MakeAssignment(IList<IToken> tokens) { }
+
+        private static CallStatement MakeCallStatement(IList<IToken> tokens) { }
     }
 }
+

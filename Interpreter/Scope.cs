@@ -24,14 +24,21 @@ namespace Interpreter
                 }
                 else
                 {
-                    throw new Exception("Undefined variable");
+                    return new None();
                 }
             }
             set
             {
                 if (Names.ContainsKey(Name))
                 {
-                    Names[Name] = value;
+                    if (value is None)
+                    {
+                        Names.Remove(Name);
+                    }
+                    else
+                    {
+                        Names[Name] = value;
+                    }
                 }
                 else
                 {
@@ -47,7 +54,13 @@ namespace Interpreter
         {
             if (Names.ContainsKey(Name))
             {
-                Names[Name] = v;
+                if (v is None)
+                {
+                    Names.Remove(Name);
+                }
+                else
+                { Names[Name] = v;
+                }
                 return true;
             }
             else if(Global)

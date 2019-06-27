@@ -107,9 +107,12 @@ namespace Interpreter
 
     public class CallStatement : Statement
     {
+        FunctionCall Call { get; set; }
+
         public override ExecutionResult Execute(Scope scope)
         {
-            throw new NotImplementedException();
+            Call.Evaluate(scope);
+            return new PerformedResult();
         }
     }
 
