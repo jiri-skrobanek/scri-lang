@@ -1,13 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using Interpreter;
 
 namespace Parser
 {
     public static partial class ParserFirstPhase
     {
-        private static IExpression MakeExpression(List<IToken> tokens)
+        private static Statement MakeStatement(IList<IToken> tokens)
+        {
+            if(tokens.Count == 1)
+            {
+                    // This statement must be break, continue, return
+                    {
+                        if(tokens[0] is ReservedWord rw)
+                        {
+                            switch(rw.Word)
+                            {
+                                case "break":
+                                    return new BreakStatement();
+                                case "continue":
+                                    return new ContinueStatement();
+                                case "return":
+                                    return new ReturnStatement { expression = new ConstantExpression{ value = new None() } };
+                                default:
+                                    throw new Exception("Invalid statement");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("Invalid statement");
+                        }
+                    }
+            }
+            else if (tokens[0] is ReservedWord rw)
+            {
+                switch(rw.Word)
+                {
+                    case "if":
+                        return MakeConditional(tokens);
+                    case "while":
+                        return MakeLoop(tokens);
+                    case "return":
+                        tokens.RemoveAt(0);
+                        return new ReturnStatement { expression = MakeExpression(tokens) };
+                    default:
+                        throw new Exception("Invalid statement");
+                }
+            }
+            else if(tokens[1] is OperatorToken op)
+            {
+                if(op.@operator == OperatorType.FDef)
+                {
+                    return MakeFunctionDefinition(tokens);
+                }
+                else if (op.@operator == OperatorType.Assign)
+                {
+                    return MakeAssignment(tokens);
+                }
+                else
+                {
+                    throw new Exception("Invalid statement");
+                }
+            }
+            else
+            {
+                throw new Exception("Unrecognized statement patterns");
+            }
+        }
+
+        private static IList<IExpression> MakeExpressionFromVector(IList<IList<IToken>> items)
+        {
+            return (from item in items select MakeExpression(item)).ToList();
+        }
+
+        private static IExpression MakeExpression(IList<IToken> tokens)
         {
             if (tokens.Count == 0)
             {
@@ -95,7 +163,7 @@ namespace Parser
                 {
                     if (exp[i].GetType() == typeof(OperatorType))
                     {
-                        var oper = (exp[i] as Operator).@operator;
+                        var oper = (exp[i] as OperatorToken).@operator;
                         if (OperatorPriorities.HasGreaterPriority(highest_priority, oper))
                         {
                             highest_priority = (int)oper;
@@ -107,7 +175,7 @@ namespace Parser
                 var left = SplitByOperator(exp.GetRange(0, highest_priority_index - 1));
                 var right = SplitByOperator(exp.GetRange(highest_priority_index + 1, exp.Count - highest_priority_index));
                 var op = tokens[highest_priority_index];
-                return new Interpreter.OperatorEvaluation() { left_arg = left, right_arg = right, @operator = (op as Operator).@operator };
+                return new Interpreter.OperatorEvaluation() { left_arg = left, right_arg = right, @operator = (op as OperatorToken).@operator };
             }
         }
 
@@ -116,7 +184,7 @@ namespace Parser
         /// </summary>
         /// <param name="list">Tokens must be with name and parentheses, i.d. in the form ["foo", "(", "a", ",", "b", ")"].</param>
         /// <returns></returns>
-        private static IToken ParseFunctionCall(, IList<IToken> list)
+        private static IToken ParseFunctionCall(IList<IToken> list)
         {
             List<IExpression> arguments = new List<IExpression>();
             // Isolated arguments:
@@ -147,11 +215,74 @@ namespace Parser
             return new ParsedExpression { expression = expr };
         }
 
-        private static Interpreter.FunctionDefinition MakeFunctionDefinition(IList<IToken> tokens) { }
+        private static Interpreter.FunctionDefinition MakeFunctionDefinition(IList<IToken> tokens)
+        {
+            
+            if (tokens[0] is CustomWord cw && tokens[2] is ArgVector av && tokens[3] is BracketContent bc)
+            {
+                var fc = new FunctionCall { functionName = cw.Word, args = MakeExpressionFromVector(av.List) };
+                return new FunctionDefinition { Name = cw.Word, Args = extract_args(av) };
+            }
+            else
+            {
+                throw new Exception("Invalid function definition");
+            }
 
-        private static Assignment MakeAssignment(IList<IToken> tokens) { }
+            List<string> extract_args(ArgVector vector)
+            {
+                var names = new List<string>();
+                foreach(var item in vector.List)
+                {
+                    if(item.Count == 1 && item[0] is CustomWord cw2)
+                    {
+                        names.Add(cw2.Word);
+                    }
+                    else
+                    {
+                        throw new Exception("Invalid argument naming in function definition");
+                    }
+                }
+                return names;
+            }
+        }
 
-        private static CallStatement MakeCallStatement(IList<IToken> tokens) { }
+        private static AssignmentStatement MakeAssignment(IList<IToken> tokens)
+        {
+            if(tokens[0] is CustomWord cw)
+            {
+                tokens.RemoveAt(0);
+                tokens.RemoveAt(0);
+                var expr = MakeExpression(tokens);
+                return new AssignmentStatement { Expression = expr, Name = cw.Word };
+            }
+            else
+            {
+                throw new Exception("Invalid assignment");
+            }
+        }
+
+        private static CallStatement MakeCallStatement(IList<IToken> tokens)
+        {
+            if (tokens[0] is CustomWord cw && tokens[1] is ArgVector av)
+            {
+                var fc = new FunctionCall { functionName = cw.Word, args = MakeExpressionFromVector(av.List) };
+                return new CallStatement { Call = fc };
+            }
+            else
+            {
+                throw new Exception("Invalid function call");
+            }
+        }
+
+        private static WhileLoop MakeLoop(IList<IToken> tokens)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static ConditionalStatement MakeConditional(IList<IToken> tokens)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

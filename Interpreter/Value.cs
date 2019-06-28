@@ -136,11 +136,11 @@ namespace Interpreter
 
     public class Function : IValue, ICallable
     {
-        public List<String> Arguments;
+        public IList<String> Arguments;
         public Scope creation_scope;
         public Block body;
 
-        public Function(List<String> Args, Block Body, Scope creation_scope)
+        public Function(IList<String> Args, Block Body, Scope creation_scope)
         {
             this.Arguments = Args;
             this.body = Body;

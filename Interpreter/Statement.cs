@@ -9,19 +9,19 @@ namespace Interpreter
         public abstract ExecutionResult Execute(Scope scope);
     }
 
-    public class Assignment : Statement
+    public class AssignmentStatement : Statement
     {
-        String variable;
-        IExpression expression;
+        public string Name { get; set; }
+        public IExpression Expression { get; set; }
 
         public override ExecutionResult Execute(Scope scope)
         {
-            scope[variable] = expression.Evaluate(scope);
+            scope[Name] = Expression.Evaluate(scope);
             return new PerformedResult();
         }
     }
 
-    public class Conditional : Statement
+    public class ConditionalStatement : Statement
     {
         IExpression condition;
         Block satisfied;
@@ -62,7 +62,7 @@ namespace Interpreter
 
     public class ReturnStatement : Statement
     {
-        public IExpression expression;
+        public IExpression expression { get; set; }
 
         public override ExecutionResult Execute(Scope scope)
         {
@@ -107,7 +107,7 @@ namespace Interpreter
 
     public class CallStatement : Statement
     {
-        FunctionCall Call { get; set; }
+        public FunctionCall Call { get; set; }
 
         public override ExecutionResult Execute(Scope scope)
         {
@@ -118,9 +118,9 @@ namespace Interpreter
 
     public class FunctionDefinition : Statement
     {
-        List<String> Args;
-        Block Body;
-        String Name;
+        public IList<string> Args;
+        public Block Body;
+        public string Name;
 
         public override ExecutionResult Execute(Scope scope)
         {

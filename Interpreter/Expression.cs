@@ -22,7 +22,7 @@ namespace Interpreter
 
     public class VariableExpression : IExpression
     {
-        public String variableName;
+        public string variableName;
 
         public IValue Evaluate(Scope scope)
         {
@@ -32,9 +32,9 @@ namespace Interpreter
 
     public class FunctionCall : IExpression
     {
-        public String functionName;
+        public string functionName;
         public byte ArgCount { get { return (byte)args.Count; } }
-        public List<IExpression> args;
+        public IList<IExpression> args;
 
         public IValue Evaluate(Scope scope)
         {

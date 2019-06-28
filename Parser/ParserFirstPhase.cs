@@ -9,7 +9,7 @@ namespace Parser
     public static partial class ParserFirstPhase
     {
         /// <summary>
-        /// Builds a code block from the given string
+        /// Builds a block of statements from the given string
         /// </summary>
         public static Block ParseCode(String Code)
         {
@@ -113,7 +113,7 @@ namespace Parser
                     {
                         index++;
                         if (content.Count == 0)
-                        { return new ArgVector() { Token = current }; }
+                        { return new ArgVector() { List = split_by_commas(current) }; }
                         else if (current.Count == 0)
                         {
                             return new BracketContent { Token = content };
@@ -129,6 +129,41 @@ namespace Parser
                     }
                 }
                 throw new Exception("Unbalanced brackets");
+            }
+
+            IList<IList<IToken>> split_by_commas(IList<IToken> tokens)
+            {
+                var result = new List<IList<IToken>>();
+                var current = new List<IToken>();
+                for(int j = 0; j < tokens.Count; j++)
+                {
+                    if(tokens[j] is Separator)
+                    {
+                        if(current.Count == 0)
+                        {
+                            throw new Exception("Null expression");
+                        }
+                        else
+                        {
+                            result.Add(current);
+                            current = new List<IToken>();
+                        }
+                    }
+                    else
+                    {
+                        current.Add(tokens[j]);
+                    }
+                }
+                if (current.Count == 0 && result.Count > 0)
+                {
+                    throw new Exception("Null expression");
+                }
+                else if(current.Count > 0)
+                {
+                    result.Add(current);
+                }
+
+                return result;
             }
         }
 
@@ -167,7 +202,7 @@ namespace Parser
                     case '=':
                     case '&':
                     case '|':
-                        new_token(); tokens.Add(new Operator(Code[i])); break;
+                        new_token(); tokens.Add(new OperatorToken(Code[i])); break;
                     case '#':
                         new_token(); tokens.Add(new CharacterConstant(Code[++i])); break;
                     case ',':

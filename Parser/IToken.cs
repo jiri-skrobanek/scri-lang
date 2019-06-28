@@ -7,7 +7,6 @@ namespace Parser
 {
     public interface IToken
     {
-        object Token { get; set; }
     }
 
     public class ParsedExpression : IToken
@@ -17,11 +16,11 @@ namespace Parser
         public IExpression expression;
     }
 
-    class Operator : IToken
+    class OperatorToken : IToken
     {
         public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public Operator(char Symbol)
+        public OperatorToken(char Symbol)
         {
             switch(Symbol)
             {
@@ -143,10 +142,10 @@ namespace Parser
     }
 
     /// <summary>
-    /// Contains the list of arguments or expression.
+    /// Contains a list of argument names or expressions separated by commas.
     /// </summary>
     class ArgVector : IToken
     {
-        public object Token { get; set; } = new List<IToken>();
+        public IList<IList<IToken>> List { get; set; } = new List<IList<IToken>>();
     }
 }
