@@ -134,7 +134,7 @@ namespace Parser
     /// </summary>
     internal class BracketContent : IToken
     {
-        public object StatementList { get; set; } = new List<List<IToken>>();
+        public IList<IList<IToken>> StatementList { get; set; } = new List<IList<IToken>>();
     }
 
     /// <summary>

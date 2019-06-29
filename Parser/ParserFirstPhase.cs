@@ -91,7 +91,7 @@ namespace Parser
             {
                 index++;
 
-                var content = new List<List<IToken>>();
+                var content = new List<IList<IToken>>();
                 var current = new List<IToken>();
                 for (; index < Tokens.Count; index++)
                 {

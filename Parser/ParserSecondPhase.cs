@@ -9,7 +9,8 @@ namespace Parser
     {
         private static Block MakeBlock(BracketContent content)
         {
-
+            var statements = from x in content.StatementList select MakeStatement(x);
+            return new Block { statements = statements };
         }
 
         private static Statement MakeStatement(IList<IToken> tokens)
@@ -85,101 +86,123 @@ namespace Parser
             {
                 throw new Exception("Void expression");
             }
-
-            // Remove function calls and nested parentheses:
-            List<IToken> simplified = new List<IToken>();
-            int bracket_index = 0;
-            int start_position = 0;
-            bool will_be_function_call = false;
-            for (int i = 0; i < tokens.Count; i++)
+            if (tokens.Count == 1)
             {
-                will_be_function_call = tokens[i].GetType() == typeof(CustomWord) && bracket_index == 0;
-                if (tokens[i].GetType() == typeof(OpeningBracket))
+                if (tokens[0] is CustomWord cw)
                 {
-                    if (bracket_index == 0)
-                    {
-                        start_position = i;
-                        if (will_be_function_call) { simplified.RemoveAt(simplified.Count - 1); }
-                    }
-                    bracket_index++;
+                    return new VariableExpression { variableName = cw.Word };
                 }
-                else if (tokens[i].GetType() == typeof(ClosingBracket))
+                else if (tokens[0] is ArgVector av)
                 {
-                    bracket_index--;
-                    if (bracket_index == 0)
+                    if (av.List.Count != 1)
                     {
-                        if (will_be_function_call)
-                        {
-                            simplified.Add(ParseFunctionCall(tokens.GetRange(start_position - 1, i - start_position + 2)));
-                        }
-                        else
-                        {
-                            simplified.Add(new ParsedExpression { expression = Parse(tokens.GetRange(start_position + 1, i - start_position - 1)) });
-                        }
+                        throw new Exception("Invalid expression");
                     }
-                    else if (bracket_index < 0)
-                    {
-                        throw new Exception("Unbalanced brackets");
-                    }
+                    return MakeExpression(av.List.First());
                 }
-                else if (bracket_index == 0)
+                else if (tokens[0] is NumericConstant nc)
                 {
-                    simplified.Add(tokens[i]);
+                    return new ConstantExpression { value = new IntegralValue(nc.Value) };
                 }
-            }
-
-            return SplitByOperator(simplified);
-
-            // Keep finding the highest priority operator:
-            IExpression SplitByOperator(List<IToken> exp)
-            {
-                if (exp.Count == 0)
+                else if (tokens[0] is CharacterConstant cc)
                 {
-                    throw new Exception("Void expression");
+                    return new ConstantExpression { value = new CharValue(cc.Token) };
                 }
-                else if (exp.Count == 1)
+                else if (tokens[0] is ReservedWord rw)
                 {
-                    if (exp[0].GetType() == typeof(ParsedExpression))
+                    if (rw.Word == "none")
                     {
-                        return (exp[0] as ParsedExpression).expression;
-                    }
-                    else if (exp[0].GetType() == typeof(CustomWord))
-                    {
-                        return new VariableExpression { variableName = (exp[0] as CustomWord).Word };
-                    }
-                    else if (exp[0].GetType() == typeof(NumericConstant))
-                    {
-                        return new ConstantExpression { value = new IntegralValue((exp[0] as NumericConstant).Value) };
+                        return new ConstantExpression { value = new None() };
                     }
                     else
                     {
                         throw new Exception("Invalid expression");
                     }
                 }
-                // Unary operator:
-                else if (exp.Count == 2)
+                else
                 {
-                    throw new NotImplementedException("Unary operator");
+                    throw new Exception("Invalid expression");
                 }
-                int highest_priority_index = 0;
-                int highest_priority = 0;
-                for (int i = 0; i < exp.Count; i++)
+            }
+            else
+            {
+                return split_by_operator(tokens, (int)OperatorType.Equals);
+            }
+
+            // 
+            IExpression split_by_operator(IList<IToken> exp, int priority)
+            {
+                if (priority <= 0)
                 {
-                    if (exp[i].GetType() == typeof(OperatorType))
+                    return function_calls(exp);
+                }
+
+                var arg = new List<IToken>();
+                int i = 0;
+                for (; i < exp.Count; i++)
+                {
+                    if (exp[i] is OperatorToken ot)
                     {
-                        var oper = (exp[i] as OperatorToken).@operator;
-                        if (OperatorPriorities.HasGreaterPriority(highest_priority, oper))
+                        if (priority <= (int)ot.@operator)
                         {
-                            highest_priority = (int)oper;
-                            highest_priority_index = i;
+                            break;
+                        }
+
+                    }
+                    arg.Add(exp[i]);
+                }
+                if (arg.Count == exp.Count)
+                {
+                    return split_by_operator(exp, priority - 100);
+                }
+                IExpression left_expression = i == 0 ? null : split_by_operator(arg, priority - 100);
+                OperatorType type = (exp[i++] as OperatorToken).@operator;
+                arg = new List<IToken>();
+                for (; i < exp.Count; i++)
+                {
+                    if (exp[i] is OperatorToken ot)
+                    {
+                        if (priority <= (int)ot.@operator)
+                        {
+                            if(arg.Count == 0)
+                            {
+                                throw new Exception("Invalid expression");
+                            }
+                            var r_expr = split_by_operator(arg, priority - 100);
+                            left_expression = new OperatorEvaluation { left_arg = left_expression, right_arg = r_expr, @operator = type };
+                            arg = new List<IToken>();
+                            type = (exp[i] as OperatorToken).@operator;
+                            continue;
+                        }
+                    }
+                    arg.Add(exp[i]);
+                }
+                if (arg.Count == 0)
+                {
+                    throw new Exception("Invalid expression");
+                }
+                return new OperatorEvaluation { left_arg = left_expression, right_arg = split_by_operator(arg, priority - 100), @operator = type };
+
+            }
+
+            IExpression function_calls(IList<IToken> list)
+            {
+                var fn = MakeExpression(list);
+                if (list.Count > 1)
+                {
+                    for(int i = 1; i < list.Count; i++)
+                    {
+                        if(list[i] is ArgVector av)
+                        {
+                            fn = new FunctionCall { function = fn, args = MakeExpressionFromVector(av.List) }; 
+                        }
+                        else
+                        {
+                            throw new Exception("Invalid expression");
                         }
                     }
                 }
-                // Binary operator:
-                var left = SplitByOperator(exp.GetRange(0, highest_priority_index - 1));
-                var right = SplitByOperator(exp.GetRange(highest_priority_index + 1, exp.Count - highest_priority_index));
-                var op = tokens[highest_priority_index];
-                return new Interpreter.OperatorEvaluation() { left_arg = left, right_arg = right, @operator = (op as OperatorToken).@operator };
+                return fn;
             }
         }
 
@@ -188,7 +211,7 @@ namespace Parser
 
             if (tokens[0] is CustomWord cw && tokens[2] is ArgVector av && tokens[3] is BracketContent bc)
             {
-                var fc = new FunctionCall { functionName = cw.Word, args = MakeExpressionFromVector(av.List) };
+                var fc = new FunctionCall { function = new VariableExpression { variableName = cw.Word }, args = MakeExpressionFromVector(av.List) };
                 return new FunctionDefinition { Name = cw.Word, Args = extract_args(av) };
             }
             else
@@ -233,7 +256,7 @@ namespace Parser
         {
             if (tokens[0] is CustomWord cw && tokens[1] is ArgVector av)
             {
-                var fc = new FunctionCall { functionName = cw.Word, args = MakeExpressionFromVector(av.List) };
+                var fc = new FunctionCall { function = new VariableExpression { variableName = cw.Word }, args = MakeExpressionFromVector(av.List) };
                 return new CallStatement { Call = fc };
             }
             else

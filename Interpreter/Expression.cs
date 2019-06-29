@@ -32,15 +32,23 @@ namespace Interpreter
 
     public class FunctionCall : IExpression
     {
-        public string functionName;
+        public IExpression function;
         public byte ArgCount { get { return (byte)args.Count; } }
         public IList<IExpression> args;
 
         public IValue Evaluate(Scope scope)
         {
             var processed = from arg in args select arg.Evaluate(scope);
-            (scope[functionName] as ICallable).Call(processed.ToList(), out var result);
-            return result;
+            var val = function.Evaluate(scope);
+            if (val is ICallable ic)
+            {
+                ic.Call(processed.ToList(), out var result);
+                return result;
+            }
+            else
+            {
+                return new None();
+            }
         }
     }
 
@@ -52,9 +60,9 @@ namespace Interpreter
 
         public IValue Evaluate(Scope scope)
         {
-            var processed_l = left_arg.Evaluate(scope);
-            var processed_r = right_arg.Evaluate(scope);
-            var application = Operator.GetApplication(@operator, processed_l.ValueKind, processed_r.ValueKind);
+            var processed_l = left_arg?.Evaluate(scope);
+            var processed_r = right_arg?.Evaluate(scope);
+            var application = Operator.GetApplication(@operator, processed_l?.ValueKind, processed_r?.ValueKind);
             return application(processed_l, processed_r);
         }
     }

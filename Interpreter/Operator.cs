@@ -7,7 +7,7 @@ namespace Interpreter
 {
     public enum OperatorType
     {
-        Plus = 200, Minus = 201, Prod = 100, Div = 101, Equals = 300, NEQ = 301, Greater = 302, Lesser = 303, And = 251, Or = 250, FDef = 400, Assign = 401
+        Plus = 200, Minus = 201, Prod = 100, Div = 101, Equals = 400, NEQ = 401, Greater = 402, Lesser = 403, And = 301, Or = 300, FDef = 500, Assign = 501
     }
 
     public delegate IValue OperatorApplication(IValue Arg1, IValue Arg2);
