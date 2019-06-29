@@ -1,42 +1,46 @@
-﻿using System;
+﻿using Interpreter;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using Interpreter;
 
 namespace Parser
 {
     public static partial class ParserFirstPhase
     {
+        private static Block MakeBlock(BracketContent content)
+        {
+
+        }
+
         private static Statement MakeStatement(IList<IToken> tokens)
         {
-            if(tokens.Count == 1)
+            if (tokens.Count == 1)
             {
-                    // This statement must be break, continue, return
+                // This statement must be break, continue, return
+                {
+                    if (tokens[0] is ReservedWord rw)
                     {
-                        if(tokens[0] is ReservedWord rw)
+                        switch (rw.Word)
                         {
-                            switch(rw.Word)
-                            {
-                                case "break":
-                                    return new BreakStatement();
-                                case "continue":
-                                    return new ContinueStatement();
-                                case "return":
-                                    return new ReturnStatement { expression = new ConstantExpression{ value = new None() } };
-                                default:
-                                    throw new Exception("Invalid statement");
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("Invalid statement");
+                            case "break":
+                                return new BreakStatement();
+                            case "continue":
+                                return new ContinueStatement();
+                            case "return":
+                                return new ReturnStatement { expression = new ConstantExpression { value = new None() } };
+                            default:
+                                throw new Exception("Invalid statement");
                         }
                     }
+                    else
+                    {
+                        throw new Exception("Invalid statement");
+                    }
+                }
             }
             else if (tokens[0] is ReservedWord rw)
             {
-                switch(rw.Word)
+                switch (rw.Word)
                 {
                     case "if":
                         return MakeConditional(tokens);
@@ -49,9 +53,9 @@ namespace Parser
                         throw new Exception("Invalid statement");
                 }
             }
-            else if(tokens[1] is OperatorToken op)
+            else if (tokens[1] is OperatorToken op)
             {
-                if(op.@operator == OperatorType.FDef)
+                if (op.@operator == OperatorType.FDef)
                 {
                     return MakeFunctionDefinition(tokens);
                 }
@@ -179,45 +183,9 @@ namespace Parser
             }
         }
 
-        /// <summary>
-        /// Parses a function call
-        /// </summary>
-        /// <param name="list">Tokens must be with name and parentheses, i.d. in the form ["foo", "(", "a", ",", "b", ")"].</param>
-        /// <returns></returns>
-        private static IToken ParseFunctionCall(IList<IToken> list)
-        {
-            List<IExpression> arguments = new List<IExpression>();
-            // Isolated arguments:
-            int arg_begin = 2;
-            int bracket_index = 0;
-            for (int i = 3; i < list.Count - 1; i++)
-            {
-                if (bracket_index == 0 && list[i].GetType() == typeof(Separator))
-                {
-                    arg_begin = i + 1;
-                    arguments.Add(Parse(list.GetRange(arg_begin, i - arg_begin)));
-                }
-                else if (list[i].GetType() == typeof(OpeningBracket))
-                {
-                    bracket_index++;
-                }
-                else if (list[i].GetType() == typeof(ClosingBracket))
-                {
-                    bracket_index--;
-                }
-            }
-            if (arg_begin < list.Count - 1)
-            {
-                arguments.Add(Parse(list.GetRange(arg_begin, list.Count - 1 - arg_begin)));
-            }
-
-            var expr = new FunctionCall { functionName = (list[0] as CustomWord).Word, args = arguments };
-            return new ParsedExpression { expression = expr };
-        }
-
         private static Interpreter.FunctionDefinition MakeFunctionDefinition(IList<IToken> tokens)
         {
-            
+
             if (tokens[0] is CustomWord cw && tokens[2] is ArgVector av && tokens[3] is BracketContent bc)
             {
                 var fc = new FunctionCall { functionName = cw.Word, args = MakeExpressionFromVector(av.List) };
@@ -231,9 +199,9 @@ namespace Parser
             List<string> extract_args(ArgVector vector)
             {
                 var names = new List<string>();
-                foreach(var item in vector.List)
+                foreach (var item in vector.List)
                 {
-                    if(item.Count == 1 && item[0] is CustomWord cw2)
+                    if (item.Count == 1 && item[0] is CustomWord cw2)
                     {
                         names.Add(cw2.Word);
                     }
@@ -248,7 +216,7 @@ namespace Parser
 
         private static AssignmentStatement MakeAssignment(IList<IToken> tokens)
         {
-            if(tokens[0] is CustomWord cw)
+            if (tokens[0] is CustomWord cw)
             {
                 tokens.RemoveAt(0);
                 tokens.RemoveAt(0);
@@ -274,14 +242,84 @@ namespace Parser
             }
         }
 
-        private static WhileLoop MakeLoop(IList<IToken> tokens)
-        {
-            throw new NotImplementedException();
-        }
-
         private static ConditionalStatement MakeConditional(IList<IToken> tokens)
         {
-            throw new NotImplementedException();
+            var condition = tokens.Skip(1).TakeWhile(x => !(x is ReservedWord)).ToList();
+            var expression = MakeExpression(condition);
+            Block satisfied, failed;
+            if (tokens.Count > condition.Count + 1 && tokens[condition.Count + 1] is ReservedWord rw)
+            {
+                if (rw.Word != "then")
+                {
+                    throw new Exception("No then in conditional statement");
+                }
+            }
+            else
+            {
+                throw new Exception("No then in conditional statement");
+            }
+            if (tokens.Count > condition.Count + 2 && tokens[condition.Count + 2] is BracketContent bc)
+            {
+                satisfied = MakeBlock(bc);
+            }
+            else
+            {
+                throw new Exception("No code to execute in conditional statement when condition succeeds");
+            }
+            if (tokens.Count > condition.Count + 3)
+            {
+                if (tokens[condition.Count + 3] is ReservedWord rw2)
+                {
+                    if (rw2.Word != "else")
+                    {
+                        throw new Exception("Else or end of statement was expected");
+                    }
+                    else if (tokens.Count == condition.Count + 4 && tokens[condition.Count + 4] is BracketContent bc2)
+                    {
+                        failed = MakeBlock(bc2);
+                    }
+                    else
+                    {
+                        throw new Exception("No code to execute in conditional statement when condition fails");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Else or end of statement was expected");
+                }
+            }
+            else
+            {
+                failed = new Block();
+            }
+            return new ConditionalStatement { condition = expression, satisfied = satisfied, unsatisfied = failed };
+        }
+
+        private static WhileLoop MakeLoop(IList<IToken> tokens)
+        {
+            var condition = tokens.Skip(1).TakeWhile(x => !(x is ReservedWord)).ToList();
+            var expression = MakeExpression(condition);
+            Block satisfied;
+            if (tokens.Count > condition.Count + 1 && tokens[condition.Count + 1] is ReservedWord rw)
+            {
+                if (rw.Word != "do")
+                {
+                    throw new Exception("No do in loop statement");
+                }
+            }
+            else
+            {
+                throw new Exception("No do in conditional statement");
+            }
+            if (tokens.Count > condition.Count + 2 && tokens[condition.Count + 2] is BracketContent bc)
+            {
+                satisfied = MakeBlock(bc);
+            }
+            else
+            {
+                throw new Exception("No code to execute in loop statement when condition succeeds");
+            }
+            return new WhileLoop { block = satisfied, condition = expression };
         }
     }
 }

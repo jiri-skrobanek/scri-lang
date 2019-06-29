@@ -116,7 +116,7 @@ namespace Parser
                         { return new ArgVector() { List = split_by_commas(current) }; }
                         else if (current.Count == 0)
                         {
-                            return new BracketContent { Token = content };
+                            return new BracketContent { StatementList = content };
                         }
                         else
                         {

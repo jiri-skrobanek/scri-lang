@@ -18,7 +18,8 @@ namespace Interpreter
             Names = new Dictionary<string, IValue>()
             {
                 ["vector"] = new Buildin() { Call = getNewVector },
-                ["map"] = new Buildin() { Call = getNewMap }
+                ["map"] = new Buildin() { Call = getNewMap },
+                ["char"] = new Buildin() { Call = makeChar }
             }
         };
 
@@ -35,11 +36,37 @@ namespace Interpreter
 
         private static void getNewMap(IList<IValue> Args, out IValue result)
         {
-            if (Args.Count > 0)
-            {
-                throw new Exception("Invalid map initialization.");
-            }
             result = new Map();
+        }
+
+        private static void makeChar(IList<IValue> Args, out IValue result)
+        {
+            if (Args.Count >= 1 && Args[1] is IntegralValue iv)
+            {
+                if(iv.value > 255 || iv.value < 0) { result = new None(); }
+                else
+                {
+                    result = new CharValue((char)iv.value);
+                }
+            }
+            else
+            {
+                result = new None();
+            }
+
+        }
+
+        private static void makeInt(IList<IValue> Args, out IValue result)
+        {
+            if (Args.Count >= 1 && Args[1] is CharValue cv)
+            {
+                result = new IntegralValue(cv.value);
+            }
+            else
+            {
+                result = new None();
+            }
+
         }
 
         #endregion Build-in functions

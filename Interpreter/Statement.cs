@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Interpreter
 {
@@ -23,13 +21,13 @@ namespace Interpreter
 
     public class ConditionalStatement : Statement
     {
-        IExpression condition;
-        Block satisfied;
-        Block unsatisfied;
+        public IExpression condition;
+        public Block satisfied;
+        public Block unsatisfied;
 
         public override ExecutionResult Execute(Scope scope)
         {
-            if(condition.Evaluate(scope).GetTruthValue())
+            if (condition.Evaluate(scope).GetTruthValue())
             {
                 return satisfied.Execute(scope);
             }
@@ -47,14 +45,26 @@ namespace Interpreter
 
         public override ExecutionResult Execute(Scope scope)
         {
-            while(condition.Evaluate(scope).GetTruthValue())
+            while (condition.Evaluate(scope).GetTruthValue())
             {
                 var result = block.Execute(scope);
 
-                if (result.GetType() == typeof(BreakResult)) break;
-                else if (result.GetType() == typeof(ContinueResult)) continue;
-                else if (result.GetType() == typeof(ReturnResult)) return result;
-                else if (result.GetType() == typeof(ErrorResult)) return result;
+                if (result.GetType() == typeof(BreakResult))
+                {
+                    break;
+                }
+                else if (result.GetType() == typeof(ContinueResult))
+                {
+                    continue;
+                }
+                else if (result.GetType() == typeof(ReturnResult))
+                {
+                    return result;
+                }
+                else if (result.GetType() == typeof(ErrorResult))
+                {
+                    return result;
+                }
             }
             return new PerformedResult();
         }
@@ -88,7 +98,7 @@ namespace Interpreter
 
     public class PrintStatement : Statement
     {
-        IExpression expression;
+        private IExpression expression;
 
         public PrintStatement(IExpression expression)
         {

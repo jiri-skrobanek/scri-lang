@@ -1,7 +1,6 @@
 ﻿using Interpreter;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Parser
 {
@@ -11,18 +10,14 @@ namespace Parser
 
     public class ParsedExpression : IToken
     {
-        public object Token { get; set; }
-
         public IExpression expression;
     }
 
-    class OperatorToken : IToken
+    internal class OperatorToken : IToken
     {
-        public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
         public OperatorToken(char Symbol)
         {
-            switch(Symbol)
+            switch (Symbol)
             {
                 case '+': @operator = OperatorType.Plus; break;
                 case '-': @operator = OperatorType.Minus; break;
@@ -40,21 +35,21 @@ namespace Parser
         public OperatorType @operator;
     }
 
-    class ClosingBracket : IToken
+    internal class ClosingBracket : IToken
     {
-        public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
     }
 
-    class OpeningBracket : IToken
+    internal class OpeningBracket : IToken
     {
-        public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
     }
 
-    abstract class WordToken : IToken
+    internal abstract class WordToken : IToken
     {
         public static WordToken NewWord(string word)
         {
-            if(ReservedWord.IsReserved(word))
+            if (ReservedWord.IsReserved(word))
             {
                 return new ReservedWord(word);
             }
@@ -67,11 +62,9 @@ namespace Parser
         protected string _word;
         public string Word
         { get; }
-
-        public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
-    class NumericConstant : IToken
+    internal class NumericConstant : IToken
     {
         public NumericConstant(string number)
         {
@@ -79,22 +72,27 @@ namespace Parser
         }
 
         public int Value;
-
-        public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
-    class CharacterConstant : IToken
+    internal class CharacterConstant : IToken
     {
 
         public CharacterConstant(char c)
         {
-            Token = c;
+            if (c <= 255)
+            {
+                Token = c;
+            }
+            else
+            {
+                throw new Exception("Invalid character value.");
+            }
         }
 
-        public object Token { get; set; }
+        public char Token { get; set; }
     }
 
-    class ReservedWord : WordToken
+    internal class ReservedWord : WordToken
     {
         public ReservedWord(string word)
         {
@@ -103,7 +101,7 @@ namespace Parser
 
         public static bool IsReserved(string Word)
         {
-            switch(Word)
+            switch (Word)
             {
                 case "if":
                 case "else":
@@ -115,7 +113,7 @@ namespace Parser
         }
     }
 
-    class CustomWord : WordToken
+    internal class CustomWord : WordToken
     {
         public CustomWord(string word)
         {
@@ -123,28 +121,26 @@ namespace Parser
         }
     }
 
-    class Separator : IToken
+    internal class Separator : IToken
     {
-        public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
-    class StatementTerminator : IToken
+    internal class StatementTerminator : IToken
     {
-        public object Token { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
     /// <summary>
     /// Contains the code inside parentheses split to statements.
     /// </summary>
-    class BracketContent : IToken
+    internal class BracketContent : IToken
     {
-        public object Token { get; set; } = new List<List<IToken>>();
+        public object StatementList { get; set; } = new List<List<IToken>>();
     }
 
     /// <summary>
     /// Contains a list of argument names or expressions separated by commas.
     /// </summary>
-    class ArgVector : IToken
+    internal class ArgVector : IToken
     {
         public IList<IList<IToken>> List { get; set; } = new List<IList<IToken>>();
     }
