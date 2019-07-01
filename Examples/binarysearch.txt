@@ -1,0 +1,23 @@
+binfind @ (data, count, item) 
+(
+	if count ? 0 then (return none;);
+	left = 0;
+	right = count - 1;
+	while left < right do
+	(
+		middle = (left + right) / 2 + 1;
+		if data(middle) ? item then
+		(
+			return middle;
+		);
+		if data(middle) > item then
+		(
+			right = middle - 1;
+		)
+		else 
+		(
+			left = middle + 1;
+		);
+	);
+	if data(left) ? item then (return left;) else (return none;);
+);

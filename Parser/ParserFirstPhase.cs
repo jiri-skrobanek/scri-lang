@@ -18,30 +18,6 @@ namespace Parser
             foreach (var st in GetStatements(tokens))
             {
                 statements.Add(MakeStatement(st));
-                /*
-                if (st[0] is ReservedWord rw)
-                {
-                    switch (rw.Word)
-                    {
-                        case "break":
-                        case "if":
-                        case "return":
-                        case "print": block.statements.Append(new PrintStatement(Parse(st.GetRange(1, st.Count - 1)))); break;
-                        default: throw new Exception("This is technically unreachable");
-                    }
-                }
-                if (st[0].GetType() != typeof(ReservedWord))
-                {
-                    throw new Exception("Invalid statement");
-                }
-                var first_word = (st[0] as ReservedWord);
-                switch (first_word.Word)
-                {
-                    case "if":
-                    case "return":
-                    case "print": block.statements.Append(new PrintStatement(Parse(st.GetRange(1, st.Count - 1)))); break;
-                    default: throw new Exception("This is technically unreachable");
-                }*/
             }
             return new Block { statements = statements };
         }

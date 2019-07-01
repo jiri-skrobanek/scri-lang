@@ -1,0 +1,6 @@
+fib @ (amount) 
+(
+	if amount ? 0 then (return 0;);
+	if amount ? 1 then (return 1;);
+	return fib(amount - 1) + fib(amount - 2);
+);

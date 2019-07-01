@@ -1,0 +1,11 @@
+max @ (first, second) 
+(
+	if first > second then
+	(
+		return first;
+	) 
+	else 
+	(
+		return second;
+	);
+);

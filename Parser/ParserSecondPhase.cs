@@ -28,7 +28,7 @@ namespace Parser
                             case "continue":
                                 return new ContinueStatement();
                             case "return":
-                                return new ReturnStatement { expression = new ConstantExpression { value = new None() } };
+                                return new ReturnStatement { Expression = new ConstantExpression { value = new None() } };
                             default:
                                 throw new Exception("Invalid statement");
                         }
@@ -49,7 +49,10 @@ namespace Parser
                         return MakeLoop(tokens);
                     case "return":
                         tokens.RemoveAt(0);
-                        return new ReturnStatement { expression = MakeExpression(tokens) };
+                        return new ReturnStatement { Expression = MakeExpression(tokens) };
+                    case "print":
+                        tokens.RemoveAt(0);
+                        return new PrintStatement(MakeExpression(tokens));
                     default:
                         throw new Exception("Invalid statement");
                 }

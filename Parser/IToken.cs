@@ -106,6 +106,12 @@ namespace Parser
                 case "if":
                 case "else":
                 case "while":
+                case "do":
+                case "then":
+                case "break":
+                case "continue":
+                case "print":
+                case "none":
                     return true;
                 default:
                     return false;

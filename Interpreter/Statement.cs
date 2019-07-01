@@ -72,11 +72,11 @@ namespace Interpreter
 
     public class ReturnStatement : Statement
     {
-        public IExpression expression { get; set; }
+        public IExpression Expression { get; set; }
 
         public override ExecutionResult Execute(Scope scope)
         {
-            return new ReturnResult() { result = expression.Evaluate(scope) };
+            return new ReturnResult() { result = Expression.Evaluate(scope) };
         }
     }
 
