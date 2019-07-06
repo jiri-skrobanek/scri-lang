@@ -4,12 +4,18 @@ using Interpreter;
 
 namespace Testing
 {
-    class Program
+    partial class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            TestAddition();
+            TestMax();
+            //Console.WriteLine("Hello World!");
+            //TestAddition();
+        }
+
+        static void Assert(bool b)
+        {
+            if (!b) throw new Exception("Incorrect result!");
         }
 
         static void TestAddition()
@@ -20,15 +26,16 @@ namespace Testing
                 right_arg = new ConstantExpression() { value = new IntegralValue(13) }, 
                 @operator = OperatorType.Plus
             };
-            var l = v.Evaluate(new Scope());
+            var l = v.Evaluate(new Scope(new Interpreter.Environment()));
             var v2 = new Interpreter.OperatorEvaluation()
             {
                 left_arg = v,
                 right_arg = new VariableExpression { variableName = "zuby" },
                 @operator = OperatorType.Prod
             };
-            var l2 = v2.Evaluate(new Scope { Global = true, Names = new Dictionary<string, IValue> { ["zuby"] = new IntegralValue(11) } });
+            var l2 = v2.Evaluate(new Scope(new Interpreter.Environment()) { Names = new Dictionary<string, IValue> { ["zuby"] = new IntegralValue(11) } });
             int i = 0;
         }
+        
     }
 }

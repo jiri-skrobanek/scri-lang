@@ -61,10 +61,6 @@ namespace Interpreter
                 {
                     return result;
                 }
-                else if (result.GetType() == typeof(ErrorResult))
-                {
-                    return result;
-                }
             }
             return new PerformedResult();
         }
@@ -109,7 +105,7 @@ namespace Interpreter
         {
             var value = expression.Evaluate(scope);
 
-            Environment.PrintText(value.ToString());
+            scope.Environment.PrintText(value.ToString());
 
             return new PerformedResult();
         }

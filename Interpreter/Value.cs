@@ -177,7 +177,7 @@ namespace Interpreter
         {
             var en = Args.GetEnumerator();
 
-            var s = new Scope { ParentScope = creation_scope };
+            var s = new Scope(creation_scope);
 
             for (int i = 0; i < Arguments.Count; i++, en.MoveNext())
             {

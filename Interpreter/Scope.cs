@@ -1,14 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NameCollection = System.Collections.Generic.Dictionary<string, Interpreter.IValue>;
 
 namespace Interpreter
 {
     public class Scope
     {
-        public bool Global = false;
-        public Dictionary<String, IValue> Names = new Dictionary<string, IValue>();
-        public Scope ParentScope;
+        public bool Global { get { return ParentScope != null; } }
+        public NameCollection Names = new NameCollection();
+        public Scope ParentScope { get; } = null;
+        public Environment Environment { get; }
+
+        public Scope(Environment environment)
+        {
+            Environment = environment;
+        }
+
+        public Scope(Scope parent_scope)
+        {
+            ParentScope = parent_scope;
+            Environment = parent_scope.Environment;
+        }
 
         public IValue this[string Name]
         {

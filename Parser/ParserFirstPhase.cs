@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Parser
 {
-    public static partial class ParserFirstPhase
+    public static partial class Parser
     {
         /// <summary>
         /// Builds a block of statements from the given string

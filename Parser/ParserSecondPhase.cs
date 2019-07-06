@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Parser
 {
-    public static partial class ParserFirstPhase
+    public static partial class Parser
     {
         private static Block MakeBlock(BracketContent content)
         {

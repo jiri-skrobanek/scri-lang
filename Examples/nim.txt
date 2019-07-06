@@ -1,0 +1,6 @@
+nim @ (matches) 
+(
+	whole = (matches / 4) * 4;
+	remove = matches - whole;
+	if remove ! 0 then (return remove;) else (return 1;);
+);

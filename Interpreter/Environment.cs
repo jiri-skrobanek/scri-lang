@@ -4,28 +4,35 @@ using System.Text;
 
 namespace Interpreter
 {
-
-
-    public static class Environment
+    public class Environment
     {
-        public delegate void PrintDirective(String Text);
-
-        public static PrintDirective PrintText { get; set; } = x => { };
-
-        public static Scope GlobalScope { get; set; } = new Scope()
+        public Environment()
         {
-            Global = true,
-            Names = new Dictionary<string, IValue>()
+            GlobalScope = new Scope(this)
             {
-                ["vector"] = new Buildin() { Call = getNewVector },
-                ["map"] = new Buildin() { Call = getNewMap },
-                ["char"] = new Buildin() { Call = makeChar }
-            }
-        };
+                Names = new Dictionary<string, IValue>()
+                {
+                    ["vector"] = new Buildin() { Call = getNewVector },
+                    ["map"] = new Buildin() { Call = getNewMap },
+                    ["char"] = new Buildin() { Call = makeChar }
+                }
+            };
+        }
+
+        public delegate void PrintDirective(string Text);
+
+        public PrintDirective PrintText { get; set; } = x => { };
+
+        public Scope GlobalScope { get; set; }
+
+        public void Execute(Block block)
+        {
+            block.Execute(GlobalScope);
+        }
 
         #region Build-in functions
 
-        private static void getNewVector(IList<IValue> Args, out IValue result)
+        protected static void getNewVector(IList<IValue> Args, out IValue result)
         {
             while(Args.Count > 0 && Args[Args.Count - 1] is None)
             {
@@ -34,12 +41,12 @@ namespace Interpreter
             result = new Vector(Args);
         }
 
-        private static void getNewMap(IList<IValue> Args, out IValue result)
+        protected static void getNewMap(IList<IValue> Args, out IValue result)
         {
             result = new Map();
         }
 
-        private static void makeChar(IList<IValue> Args, out IValue result)
+        protected static void makeChar(IList<IValue> Args, out IValue result)
         {
             if (Args.Count >= 1 && Args[1] is IntegralValue iv)
             {
@@ -56,7 +63,7 @@ namespace Interpreter
 
         }
 
-        private static void makeInt(IList<IValue> Args, out IValue result)
+        protected static void makeInt(IList<IValue> Args, out IValue result)
         {
             if (Args.Count >= 1 && Args[1] is CharValue cv)
             {

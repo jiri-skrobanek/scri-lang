@@ -53,14 +53,4 @@ namespace Interpreter
             resultType = ResultType.Continue;
         }
     }
-
-    class ErrorResult : ExecutionResult
-    {
-        public string Message;
-
-        public ErrorResult()
-        {
-            resultType = ResultType.Error;
-        }
-    }
 }

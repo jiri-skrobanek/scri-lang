@@ -10,7 +10,7 @@ namespace Interpreter
 
         public ExecutionResult Execute(Scope s)
         {
-            Scope myScope = new Scope() { ParentScope = s };
+            Scope myScope = new Scope(s);
             foreach(Statement stat in statements)
             {
                 var result = stat.Execute(myScope);
