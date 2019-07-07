@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Parser
 {
+    /// <summary>
+    /// Type for representing code fragments of varying type
+    /// </summary>
     public interface IToken
     {
     }
@@ -61,7 +64,7 @@ namespace Parser
 
         protected string _word;
         public string Word
-        { get; }
+        { get { return _word; } }
     }
 
     internal class NumericConstant : IToken
@@ -112,6 +115,7 @@ namespace Parser
                 case "continue":
                 case "print":
                 case "none":
+                case "return":
                     return true;
                 default:
                     return false;

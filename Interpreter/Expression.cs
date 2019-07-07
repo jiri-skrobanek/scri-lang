@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Interpreter
 {
+    /// <summary>
+    /// Represents a language expression of different kinds.
+    /// </summary>
     public interface IExpression
     {
         IValue Evaluate(Scope scope);

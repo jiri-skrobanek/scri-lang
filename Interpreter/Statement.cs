@@ -2,6 +2,9 @@
 
 namespace Interpreter
 {
+    /// <summary>
+    /// Base class for representing statements.
+    /// </summary>
     public abstract class Statement : IExecutable
     {
         public abstract ExecutionResult Execute(Scope scope);
@@ -31,9 +34,13 @@ namespace Interpreter
             {
                 return satisfied.Execute(scope);
             }
-            else
+            else if(unsatisfied != null)
             {
                 return unsatisfied.Execute(scope);
+            }
+            else
+            {
+                return new PerformedResult();
             }
         }
     }

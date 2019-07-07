@@ -10,7 +10,7 @@ namespace Parser
         private static Block MakeBlock(BracketContent content)
         {
             var statements = from x in content.StatementList select MakeStatement(x);
-            return new Block { statements = statements };
+            return new Block { statements = statements.ToArray() };
         }
 
         private static Statement MakeStatement(IList<IToken> tokens)
@@ -71,6 +71,10 @@ namespace Parser
                 {
                     throw new Exception("Invalid statement");
                 }
+            }
+            else if (tokens[1] is ArgVector && tokens[0] is CustomWord)
+            {
+                return MakeCallStatement(tokens);
             }
             else
             {
@@ -184,13 +188,18 @@ namespace Parser
                 {
                     throw new Exception("Invalid expression");
                 }
-                return new OperatorEvaluation { left_arg = left_expression, right_arg = split_by_operator(arg, priority - 100), @operator = type };
+                return new OperatorEvaluation
+                {
+                    left_arg = left_expression,
+                    right_arg = split_by_operator(arg, priority - 100),
+                    @operator = type
+                };
 
             }
 
             IExpression function_calls(IList<IToken> list)
             {
-                var fn = MakeExpression(list);
+                var fn = MakeExpression(list.Take(1).ToList());
                 if (list.Count > 1)
                 {
                     for(int i = 1; i < list.Count; i++)
@@ -214,8 +223,12 @@ namespace Parser
 
             if (tokens[0] is CustomWord cw && tokens[2] is ArgVector av && tokens[3] is BracketContent bc)
             {
-                var fc = new FunctionCall { function = new VariableExpression { variableName = cw.Word }, args = MakeExpressionFromVector(av.List) };
-                return new FunctionDefinition { Name = cw.Word, Args = extract_args(av) };
+                var fc = new FunctionCall
+                {
+                    function = new VariableExpression { variableName = cw.Word },
+                    args = MakeExpressionFromVector(av.List)
+                };
+                return new FunctionDefinition { Name = cw.Word, Args = extract_args(av), Body = MakeBlock(bc) };
             }
             else
             {
@@ -259,7 +272,11 @@ namespace Parser
         {
             if (tokens[0] is CustomWord cw && tokens[1] is ArgVector av)
             {
-                var fc = new FunctionCall { function = new VariableExpression { variableName = cw.Word }, args = MakeExpressionFromVector(av.List) };
+                var fc = new FunctionCall
+                {
+                    function = new VariableExpression { variableName = cw.Word },
+                    args = MakeExpressionFromVector(av.List)
+                };
                 return new CallStatement { Call = fc };
             }
             else
@@ -300,7 +317,7 @@ namespace Parser
                     {
                         throw new Exception("Else or end of statement was expected");
                     }
-                    else if (tokens.Count == condition.Count + 4 && tokens[condition.Count + 4] is BracketContent bc2)
+                    else if (tokens.Count == condition.Count + 5 && tokens[condition.Count + 4] is BracketContent bc2)
                     {
                         failed = MakeBlock(bc2);
                     }
@@ -316,7 +333,7 @@ namespace Parser
             }
             else
             {
-                failed = new Block();
+                failed = null;
             }
             return new ConditionalStatement { condition = expression, satisfied = satisfied, unsatisfied = failed };
         }

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Interpreter
 {
+    /// <summary>
+    /// Provider of built-in functions. (Base class)
+    /// </summary>
     public class Environment
     {
         public Environment()
@@ -27,7 +30,7 @@ namespace Interpreter
 
         public void Execute(Block block)
         {
-            block.Execute(GlobalScope);
+            block.Execute(this);
         }
 
         #region Build-in functions

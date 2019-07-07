@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Interpreter
 {
+    /// <summary>
+    /// Represents a sequence of statements.
+    /// </summary>
     public class Block : IExecutable
     {
         public IEnumerable<Statement> statements;
@@ -11,9 +14,14 @@ namespace Interpreter
         public ExecutionResult Execute(Scope s)
         {
             Scope myScope = new Scope(s);
-            foreach(Statement stat in statements)
+            return _execute(myScope);
+        }
+
+        protected ExecutionResult _execute(Scope scope)
+        {
+            foreach (Statement stat in statements)
             {
-                var result = stat.Execute(myScope);
+                var result = stat.Execute(scope);
                 switch (result.resultType)
                 {
                     case ResultType.Break:
@@ -26,6 +34,11 @@ namespace Interpreter
                 }
             }
             return new PerformedResult();
+        }
+
+        public ExecutionResult Execute(Environment env)
+        {
+            return _execute(env.GlobalScope);
         }
     }
 }

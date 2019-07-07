@@ -5,11 +5,14 @@ using NameCollection = System.Collections.Generic.Dictionary<string, Interpreter
 
 namespace Interpreter
 {
+    /// <summary>
+    /// Class for holding names and providing scope.
+    /// </summary>
     public class Scope
     {
-        public bool Global { get { return ParentScope != null; } }
-        public NameCollection Names = new NameCollection();
-        public Scope ParentScope { get; } = null;
+        public bool Global { get { return ParentScope == null; } }
+        internal NameCollection Names = new NameCollection();
+        public Scope ParentScope { get; }
         public Environment Environment { get; }
 
         public Scope(Environment environment)
@@ -55,7 +58,7 @@ namespace Interpreter
                 }
                 else
                 {
-                    if (!ParentScope.assign_only(Name, value))
+                    if (Global || !ParentScope.assign_only(Name, value))
                     {
                         Names.Add(Name, value);
                     }

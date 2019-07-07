@@ -22,10 +22,10 @@ namespace Interpreter
                     ["char"] = new Buildin() { Call = makeChar }
                 }
             };
-            GlobalScope.Names.Add("reset", new Buildin { Call = reset });
+            GlobalScope["reset"] =  new Buildin { Call = reset };
             if (fileStream.CanRead)
             {
-                GlobalScope.Names.Add("read", new Buildin { Call = getChar });
+                GlobalScope["read"] = new Buildin { Call = getChar };
             }
             if (fileStream.CanWrite)
             {

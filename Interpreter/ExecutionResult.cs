@@ -14,6 +14,9 @@ namespace Interpreter
         Performed, Return, Break, Continue, Error
     }
 
+    /// <summary>
+    /// Overlying class for results of statement execution.
+    /// </summary>
     public abstract class ExecutionResult
     {
         public ResultType resultType;

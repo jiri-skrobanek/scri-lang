@@ -4,11 +4,19 @@ using System.Text;
 
 namespace Interpreter
 {
+    /// <summary>
+    /// Overlying type for values
+    /// </summary>
     public interface IValue
     {
         ValueKind ValueKind { get; }
 
         bool GetTruthValue();
+    }
+
+    public enum ValueKind
+    {
+        None, Char, Integral, Vector, Map, Function, Builtin
     }
 
     public struct None : IValue
@@ -179,8 +187,9 @@ namespace Interpreter
 
             var s = new Scope(creation_scope);
 
-            for (int i = 0; i < Arguments.Count; i++, en.MoveNext())
+            for (int i = 0; i < Arguments.Count; i++)
             {
+                en.MoveNext();
                 s[Arguments[i]] = en.Current;
             }
 
@@ -365,7 +374,7 @@ namespace Interpreter
 
     public class Buildin : IValue, ICallable
     {
-        public ValueKind ValueKind { get { return ValueKind.Buildin; } }
+        public ValueKind ValueKind { get { return ValueKind.Builtin; } }
 
         public Invocation Call { get; set; }
 

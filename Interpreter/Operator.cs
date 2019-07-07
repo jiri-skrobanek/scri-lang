@@ -5,39 +5,25 @@ using OpDict = System.Collections.Generic.Dictionary<(Interpreter.OperatorType, 
 
 namespace Interpreter
 {
+    /// <summary>
+    /// Lists all operators and their priorities.
+    /// </summary>
     public enum OperatorType
     {
-        Plus = 200, Minus = 201, Prod = 100, Div = 101, Equals = 300, NEQ = 301, Greater = 302, Lesser = 303, And = 401, Or = 400, FDef = 500, Assign = 501
+        Prod = 100, Div = 101,
+        Plus = 200, Minus = 201,
+        Equals = 300, NEQ = 301, Greater = 302, Lesser = 303,
+        And = 401, Or = 400,
+        FDef = 500, Assign = 501
     }
 
     public delegate IValue OperatorApplication(IValue Arg1, IValue Arg2);
 
-    public class Operator : ICallable
+    /// <summary>
+    /// Provides implementation of operators.
+    /// </summary>
+    public static class Operator
     {
-        public int Priority { get { return (int)type; } }
-        public byte Arity;
-        public ValueKind operand1;
-        public ValueKind operand2;
-        public OperatorType type;
-        //public OperatorApplication application;
-
-        public Operator(byte Arity, ValueKind operand1, ValueKind operand2, OperatorType type)
-        {
-            this.Arity = Arity;
-            this.operand1 = operand1;
-            this.operand2 = operand2;
-            this.type = type;
-        }
-
-        public Invocation Call { get { return _call; } }
-
-        void _call(IEnumerable<IValue> Args, out IValue Result)
-        {
-            var en = Args.GetEnumerator(); en.MoveNext();
-            var first = en.Current;
-            var second = en.MoveNext() ? en.Current : null;
-            Result = GetApplication(type, operand1, operand2)(first, second);
-        }
 
         private static readonly OpDict SpecificOperators = new OpDict
         {

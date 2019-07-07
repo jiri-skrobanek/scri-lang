@@ -40,7 +40,6 @@ namespace Parser
 
             List<IToken> read_next_statement(ref int index)
             {
-                int bracket_level = 0;
                 var statement = new List<IToken>();
                 for (; index < Tokens.Count; index++)
                 {
@@ -48,7 +47,7 @@ namespace Parser
                     {
                         statement.Add(read_next_bracket(ref index));
                     }
-                    if (bracket_level == 0 && Tokens[index] is StatementTerminator)
+                    else if (Tokens[index] is StatementTerminator)
                     {
                         if (statement.Count == 0)
                         {
@@ -57,6 +56,10 @@ namespace Parser
 
                         index++;
                         break;
+                    }
+                    else
+                    {
+                        statement.Add(Tokens[index]);
                     }
                 }
 
@@ -87,7 +90,6 @@ namespace Parser
                     }
                     else if (Tokens[index] is ClosingBracket)
                     {
-                        index++;
                         if (content.Count == 0)
                         { return new ArgVector() { List = split_by_commas(current) }; }
                         else if (current.Count == 0)
@@ -178,6 +180,7 @@ namespace Parser
                     case '=':
                     case '&':
                     case '|':
+                    case '@':
                         new_token(); tokens.Add(new OperatorToken(Code[i])); break;
                     case '#':
                         new_token(); tokens.Add(new CharacterConstant(Code[++i])); break;
@@ -186,7 +189,7 @@ namespace Parser
                     case ';':
                         new_token(); tokens.Add(new StatementTerminator()); break;
                     case char c:
-                        if (sb.Length == 0 && c >= 0 && c <= 9)
+                        if (sb.Length == 0 && c >= '0' && c <= '9')
                         {
                             read_numeric(ref i);
                         }
@@ -212,7 +215,7 @@ namespace Parser
 
             void read_numeric(ref int index)
             {
-                while (index < Code.Length && Code[index] >= 0 && Code[index] <= 9)
+                while (index < Code.Length && Code[index] >= '0' && Code[index] <= '9')
                 {
                     sb.Append(Code[index++]);
                 }
