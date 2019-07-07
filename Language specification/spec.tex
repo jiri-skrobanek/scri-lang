@@ -1,0 +1,268 @@
+\documentclass[a4paper,11pt,openany]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{tikz,multirow,listingsutf8,multicol,amsmath,amsfonts}
+\lstdefinelanguage{MyL}{tabsize=3,morekeywords={if,else,then,break,return,while,do,continue,@,+,-,>,<,print},sensitive=true,stringstyle=\color{orange},basicstyle=\ttfamily\large,keywordstyle=\color{blue!60!black}}
+\lstset{language=MyL,showstringspaces=false}
+\geometry{left=20mm,right=20mm,top=20mm,bottom=20mm}
+\parindent=0mm
+\parskip=0mm
+\usepackage{hyperref}
+\newcommand{\quotefont}[2]{
+	#1 [online]. [Citováno \today].\\
+	Dostupné z:\\\small \ttfamily #2 \normalfont
+}
+
+
+\begin{document}
+\begin{center}
+\pagenumbering{arabic}
+{\huge \textbf{Language Specification}}\\
+\vspace{10mm} {\large Jiří Škrobánek\footnote[1]{Faculty of Mathematics and Physics, Charles University, Prague, {\ttfamily jiri@skrobanek.cz}}}\\
+\vspace{10mm}\today, Ostrava
+\end{center}
+	
+\section*{Introduction}
+	
+This document specifies all the syntax and semantics of this interpreted language. Some trivial examples are provided to illustrate it.
+	
+\tableofcontents
+
+\section{Syntax Fundamentals}
+
+The program file should be encoded as ASCII without characters above 127. This is not necessary, but the parser is not guaranteed to function in other situations.
+
+Whitespace characters do not modify the semantics of a program. There is an exception with reserved words (typeset in blue in this document), these must be separated by at least one whitespace character from other names, but not operators or parentheses.
+
+Uppercase and lowercase letters are distinct characters, id est the language is case-sensitive.
+
+\subsection{Statements}
+
+Statements are the elementary parts of code, they specify actions to be executed. A statement is always terminated by the semicolon character (\texttt{;}).
+
+\subsection{Blocks}
+
+Blocks enclose sequences of statements. Blocks are enclosed in parentheses e.g.\\ \texttt{([STATEMENT1] [STATEMENT2])} is a block with two statements.
+
+A block must always contain at least one statement. When no statement is required for the algorithm, depending on the context either return or continue statement can be used.
+
+\subsection{Names}
+
+Names are strings of ASCII characters of maximum length 8 characters. Names can contain Latin characters and are case sensitive.
+
+Names hold a value within their scope of existence, this value can be used by putting its name in stead of its literal value. The scope of a name is its block and all descendant blocks. If the name is assigned outside any block, it can be accessed from anywhere.
+
+If a name is used but its value is not set, it will default to type none.
+
+Reserved words colored blue in this documentation cannot be used as names.
+	
+\section{Data Types}
+
+Data types are types of objects in this programming language, data types can be assigned to names. 
+
+\subsection{None}
+
+This type means that no value is held by a name or that no value is provided as a result of a function. This type only has one instance. Literally in code it is expressed as the word \texttt{\color{blue!60!black}none}.
+
+None results in false when converted to logical value.
+
+\subsection{Integral Number}
+
+This type is 32-bit signed integer. Literally in code is represented in decimal base.
+
+When converted to logical value, integer results in true if and only if it is not equal to 0.
+
+\subsection{Character}
+
+This type allows the representation of ASCII and high-ASCII characters. Literally in code it is represented as \texttt{\#[CHARACTER]}, this representation should not be used with high-ASCII characters though.
+
+When converted to logical value, character results in true if and only if it is not equal to ASCII value 0.
+
+\subsection{Function}
+
+Functions are composed of a block of code which can use names from the scope where defined. Upon being called, it also receives a number of values as arguments which are named by the names provided for the arguments.
+
+Since function body is a block, it must contain at least one statement.
+
+Functions calls may also be used as expressions. If a function contains a return statement, when such statement is executed, value of this expression will be set to this value. If no return is executed during the function execution and the function call is used as an expression, none will be set as value of this expression.
+
+Functions result in true when converted to logical value.
+
+\subsection{List}
+
+List (vector) contains elements of any type, every element can have different type.
+Elements are indexed by nonnegative integers. Elements cannot be none.
+
+When converted to logical value, a list results in true if and only if it is not empty.
+
+\subsection{Map}
+	
+Map contains elements of any type, every element can have different type.
+Elements are indexed by any non-none values. Elements cannot be none.
+	
+When converted to logical value, a map results in true if and only if it is not empty.
+	
+\section{Expressions and Operators}
+
+Expressions are parts of program that may be evaluated.
+
+\subsection{Simple expression}
+
+Simple expression directly represent a value, these are names, integer literals, character literals, none. 
+
+
+
+\subsection{Expression composition}
+
+Expressions are composed by operators using the scheme:
+
+\texttt{[EXPR1] [OPERATOR] [EXPR2]}.
+
+Or for unary operators only
+
+\texttt{[OPERATOR] [EXPR2]}.
+
+Where \texttt{[EXPR1] } and \texttt{[EXPR2]} are expressions. \texttt{[OPERATOR]} is one of the following characters:\\ \texttt{+, -, *, /, \&, |, >, <, !, ?}
+
+Function call operation can also be used for expression composition. In that case the syntax is: 
+
+\texttt{[FN] ([EXPR1], [EXPR2], ...)}.
+
+Where \texttt{[FN]} is an expression that evaluates to a function.
+
+\subsection{Operators}
+
+Operators ordered by priority, operators with the lowest priority are evaluated first. Operators of the same priority cannot be chained (making them unary). Priority can be overridden using parentheses.
+
+\begin{center}
+	\begin{tabular}{cc}
+		Priority & Operators \\ \hline
+		0 & Function call \\ 
+		100 & \texttt{*, /} \\ 
+		200 & \texttt{+, -} \\ 
+		300 & \texttt{?, !, <, >} \\ 
+		400 & \texttt{\&, |}
+	\end{tabular}
+\end{center}
+
+\textbf{Multiplication (*)} is defined for integers only (as binary operator), should the result overflow, the lowest bytes are returned.
+
+\textbf{Division (/)} is defined for integers only (as binary operator), the result is truncated. Should division by zero occur, none is returned.
+
+\textbf{Addition (+)} is defined for integers only, both unary and binary, should the result overflow, the lowest bytes are returned.
+
+\textbf{Subtraction (--)} is defined for integers only, both unary and binary, should the result overflow, the lowest bytes are returned.
+
+\textbf{Equality (?)} is defined for any two value types (binary only). First the types of arguments is assessed, if the types differ, the values are not equal. Integers and characters are then assessed by value, none is equal to other none. Names representing a function, list, or map are equal if they represent the same object (determined by the call to initializer or function definition). If the two values are determined as equal, the integer 1 is returned, 0 otherwise.
+
+\textbf{Inequality (!)} is always the negation of equality. 0 and 1 are switched.
+
+\textbf{Lesser than ($<$)} is defined for integers only (as binary operator).
+
+\textbf{Greater than ($>$)} is defined for integers only (as binary operator).
+
+\textbf{And (\&)} is defined for any two value types (binary only). 1 is returned if both values are convertible to true, 0 otherwise.
+
+\textbf{Or ($|$)} is defined for any two value types (binary only). 1 is returned if at least one of the values is convertible to true, 0 otherwise.
+
+If an operator is not applicable to argument types, none is returned. In particular, build-in functions cannot be arguments for any operator.
+
+\begin{lstlisting}[frame=none]
+
+\end{lstlisting}
+
+\section{Statement patterns}
+
+All statements must adhere to one of the following patterns.
+
+\subsection{Assignment}
+\begin{lstlisting}[frame=none]
+[NAME] = [EXPRESSION];
+\end{lstlisting}
+
+The \texttt{[EXPRESSION]} expression will be evaluated and its result will be assigned to the name \texttt{[NAME]}.
+
+\subsection{Function Definition}
+\begin{lstlisting}[frame=none]
+[NAME] @ ([ARG1], [ARG2], ...) [BLOCK];
+\end{lstlisting}
+A function will be created and assigned to the name \texttt{[NAME]}. All arguments must be names, these names will be assigned values passed as arguments when called. \texttt{[BLOCK]} will be the body of this function.
+
+\subsection{Function Call}
+\begin{lstlisting}[frame=none]
+[NAME]([ARG1], [ARG2], ...);
+\end{lstlisting}
+Function with the name \texttt{[NAME]} will be called with passed arguments, the count of the arguments need not match the count in definition. Any unfilled name will be none.
+
+\subsection{Conditional branching}
+\begin{lstlisting}[frame=none]
+if [EXPRESSION] then [BLOCK1] else [BLOCK2];
+\end{lstlisting}
+
+The \texttt{[EXPRESSION]} expression will be evaluated and if the result converts to true, \texttt{[BLOCK1]} will be executed, otherwise \texttt{[BLOCK2]} will be executed.
+
+The second clause may be omitted: 
+
+\begin{lstlisting}[frame=none]
+if [EXPRESSION] then [BLOCK1];
+\end{lstlisting}
+
+\subsection{Loop}
+
+\begin{lstlisting}[frame=none]
+while [EXPRESSION] do [BLOCK];
+\end{lstlisting}
+
+The \texttt{[BLOCK]} will continually be executed while the \texttt{[EXPRESSION]} expression is evaluated to a value convertible true.
+
+\subsection{Break}
+
+\begin{lstlisting}[frame=none]
+break;\end{lstlisting}
+
+
+This statement will skip the execution of the remaining statements in the current block. If this statement is used in loop, this loop will not be repeated anymore.
+
+\subsection{Continue}
+
+\begin{lstlisting}[frame=none]
+continue;\end{lstlisting}
+
+This statement will skip the execution of the remaining statements in the current block. If this statement is used in loop, this loop will be repeated if the condition still evaluates to a truth equivalent.
+
+\subsection{Return}
+
+\begin{lstlisting}[frame=none]
+return [EXPRESSION];\end{lstlisting}
+
+This statement will skip the execution of the remaining statements in the current function. The result of this function will be set to the \texttt{[EXPRESSION]}.
+
+The following can also be used in that case the return value is set to none.
+
+\begin{lstlisting}
+return;
+\end{lstlisting}
+
+\subsection{Print}
+
+\begin{lstlisting}[frame=none]
+print [EXPRESSION];\end{lstlisting}
+
+The \texttt{[EXPRESSION]} expression will be evaluated and printed to the output designated by current environment.
+
+\section{Undefined behavior}
+
+Should the code not comply with this specification, its execution will either produce error upon parsing, execution, or the interpreter will behave in an unpredictable way.
+
+\section{Examples}
+The following function returns the maximum of two integers:
+\lstinputlisting{../Examples/max.txt}
+The following function provides the optimal move for the basic Nim game (1 to 3 matches are removed in one move).
+\lstinputlisting{../Examples/nim.txt}
+It is assumed that the programmers could create games (exampli gratia \textit{The Epic Robot Wrestling 2019}) and let others submit strategies in form of functions in this language as this language is easy to master and easy to control.
+The following function conducts a binary search in a sorted list of integers and returns the index of searched item or none if not present:
+\lstinputlisting{../Examples/binarysearch.txt}
+The following function received a natural number and returns the Fibonacci number with that index. The suboptimal recursive algorithm is used to demonstrate recursion capability.
+\lstinputlisting{../Examples/fibonacci.txt}
+\end{document}

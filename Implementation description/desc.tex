@@ -1,0 +1,43 @@
+\documentclass[a4paper,11pt,openany]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\geometry{left=20mm,right=20mm,top=20mm,bottom=20mm}
+\parindent=0mm
+\parskip=0mm
+\usepackage{hyperref}
+
+
+\begin{document}
+\begin{center}
+\pagenumbering{arabic}
+{\huge \textbf{Implementation description}}\\
+\vspace{10mm} {\large Jiří Škrobánek\footnote[1]{Faculty of Mathematics and Physics, Charles University, Prague, {\ttfamily jiri@skrobanek.cz}}}\\
+\vspace{10mm}\today, Ostrava
+\end{center}
+	
+\section*{Introduction}
+	
+This document briefly describes the usage and implementation of parser and interpreter. For more information about particular features comments in the source code may be seen.
+	
+\section*{Parser}
+
+The purpose of the parser is to convert textual representation of a program into internal binary structure. The format of valid textual representation is described in language specification.
+
+The process of parsing begins by tokenization of the code. There are various types of tokens which determine which kind of statement or expression should be matched.
+
+Once tokenization is complete, the list of tokens is split into statements and a statement object is created for each statement. This is done recursively for function bodies, loops, and conditional branching.
+
+Expressions are created recursively, operators are found by their priority in descending order ending with function calls. Once all operators of the highest priority are found, should their arguments still be composed expressions, operators of lower priority are found, this process is repeated for all priority levels.
+
+The conversion from text to binary representation is linear in time complexity with the length of the text.
+	
+\section*{Interpreter}
+
+The interpreter receives binary representation of a program (either produced by the parser or generated programmatically) and executes it.
+
+The program is executed inside an environment which provides special global built-in functions and variables.
+
+Classes exist for features of the language such as statements, expressions, values. Subtypes of these features have their own descendant classes.
+
+\end{document}
