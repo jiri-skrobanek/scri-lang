@@ -22,7 +22,7 @@ f3 = fib(3);
 f4 = fib(4);
 ";
 
-            var env = new Interpreter.Environment();
+            var env = new Interpreter.Environment.DefaultEnvironment();
             var block = Parser.Parser.ParseCode(source);
             env.Execute(block);
             Assert(((Interpreter.IntegralValue)env.GlobalScope["f0"]).value == 0);

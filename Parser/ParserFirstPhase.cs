@@ -109,7 +109,7 @@ namespace Parser
                 throw new Exception("Unbalanced brackets");
             }
 
-            IList<IList<IToken>> split_by_commas(IList<IToken> tokens)
+            static IList<IList<IToken>> split_by_commas(IList<IToken> tokens)
             {
                 var result = new List<IList<IToken>>();
                 var current = new List<IToken>();

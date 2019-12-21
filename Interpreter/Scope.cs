@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Interpreter.Environment;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using NameCollection = System.Collections.Generic.Dictionary<string, Interpreter.IValue>;
@@ -13,9 +14,9 @@ namespace Interpreter
         public bool Global { get { return ParentScope == null; } }
         internal NameCollection Names = new NameCollection();
         public Scope ParentScope { get; }
-        public Environment Environment { get; }
+        public IEnvironment Environment { get; }
 
-        public Scope(Environment environment)
+        public Scope(IEnvironment environment)
         {
             Environment = environment;
         }

@@ -44,7 +44,7 @@ while i ! 10 do
 k = binfind(nums, 10, 70);
 ";
 
-            var env = new Interpreter.Environment();
+            var env = new Interpreter.Environment.DefaultEnvironment();
             var block = Parser.Parser.ParseCode(source);
             env.Execute(block);
             Assert(((Interpreter.IntegralValue)env.GlobalScope["k"]).value == 7);

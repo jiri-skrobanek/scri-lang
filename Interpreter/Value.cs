@@ -223,7 +223,7 @@ namespace Interpreter
 
     public class Vector : IValue, ICallable
     {
-        private List<IValue> items = new List<IValue>();
+        private readonly List<IValue> items = new List<IValue>();
 
         public Vector(IList<IValue> Args)
         {
@@ -316,7 +316,7 @@ namespace Interpreter
 
     public class Map : IValue, ICallable
     {
-        private Dictionary<IValue,IValue> items = new Dictionary<IValue, IValue>();
+        private readonly Dictionary<IValue,IValue> items = new Dictionary<IValue, IValue>();
 
         public Invocation Call { get { return _call; } }
 
@@ -372,11 +372,16 @@ namespace Interpreter
         public ValueKind ValueKind { get { return ValueKind.Vector; } }
     }
 
-    public class Buildin : IValue, ICallable
+    public class BuiltinFunction : IValue, ICallable
     {
+        public BuiltinFunction(Invocation invocation)
+        {
+            Call = invocation;
+        }
+
         public ValueKind ValueKind { get { return ValueKind.Builtin; } }
 
-        public Invocation Call { get; set; }
+        public Invocation Call { get; private set; }
 
         public bool GetTruthValue()
         {

@@ -1,31 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Interpreter
+namespace Interpreter.Environment
 {
     /// <summary>
     /// An environment for interfacing with a file.
     /// </summary>
-    internal class FileEnvironment : Environment
+    public class FileEnvironment : DefaultEnvironment
     {
-        private System.IO.FileStream stream;
+        private readonly System.IO.FileStream stream;
 
         public FileEnvironment(System.IO.FileStream fileStream)
         {
             stream = fileStream;
-            GlobalScope = new Scope(this)
-            {
-                Names = new Dictionary<string, IValue>()
-                {
-                    ["vector"] = new Buildin() { Call = getNewVector },
-                    ["map"] = new Buildin() { Call = getNewMap },
-                    ["char"] = new Buildin() { Call = makeChar }
-                }
-            };
-            GlobalScope["reset"] =  new Buildin { Call = reset };
             if (fileStream.CanRead)
             {
-                GlobalScope["read"] = new Buildin { Call = getChar };
+                GlobalScope["read"] = new Interpreter.BuiltinFunction(getChar);
             }
             if (fileStream.CanWrite)
             {
@@ -53,7 +43,8 @@ namespace Interpreter
         /// <summary>
         /// Sets the position in the file to begin.
         /// </summary>
-        private void reset(IList<IValue> Args, out IValue result)
+        [BuiltinFunction("reset")]
+        protected void reset(IList<IValue> Args, out IValue result)
         {
             result = new None();
             stream.Seek(0, System.IO.SeekOrigin.Begin);

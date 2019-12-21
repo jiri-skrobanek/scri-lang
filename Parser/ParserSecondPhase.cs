@@ -21,17 +21,13 @@ namespace Parser
                 {
                     if (tokens[0] is ReservedWord rw)
                     {
-                        switch (rw.Word)
+                        return rw.Word switch
                         {
-                            case "break":
-                                return new BreakStatement();
-                            case "continue":
-                                return new ContinueStatement();
-                            case "return":
-                                return new ReturnStatement { Expression = new ConstantExpression { value = new None() } };
-                            default:
-                                throw new Exception("Invalid statement");
-                        }
+                            "break" => new BreakStatement(),
+                            "continue" => new ContinueStatement(),
+                            "return" => new ReturnStatement { Expression = new ConstantExpression { value = new None() } },
+                            _ => throw new Exception("Invalid statement")
+                        };
                     }
                     else
                     {
@@ -136,8 +132,7 @@ namespace Parser
                 return split_by_operator(tokens, (int)OperatorType.Equals);
             }
 
-            // 
-            IExpression split_by_operator(IList<IToken> exp, int priority)
+            static IExpression split_by_operator(IList<IToken> exp, int priority)
             {
                 if (priority <= 0)
                 {
@@ -197,7 +192,7 @@ namespace Parser
 
             }
 
-            IExpression function_calls(IList<IToken> list)
+            static IExpression function_calls(IList<IToken> list)
             {
                 var fn = MakeExpression(list.Take(1).ToList());
                 if (list.Count > 1)
@@ -235,7 +230,7 @@ namespace Parser
                 throw new Exception("Invalid function definition");
             }
 
-            List<string> extract_args(ArgVector vector)
+            static List<string> extract_args(ArgVector vector)
             {
                 var names = new List<string>();
                 foreach (var item in vector.List)

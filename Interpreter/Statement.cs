@@ -101,7 +101,7 @@ namespace Interpreter
 
     public class PrintStatement : Statement
     {
-        private IExpression expression;
+        private readonly IExpression expression;
 
         public PrintStatement(IExpression expression)
         {

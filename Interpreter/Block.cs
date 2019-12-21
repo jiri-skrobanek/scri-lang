@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Interpreter.Environment;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -36,7 +37,7 @@ namespace Interpreter
             return new PerformedResult();
         }
 
-        public ExecutionResult Execute(Environment env)
+        public ExecutionResult Execute(IEnvironment env)
         {
             return _execute(env.GlobalScope);
         }

@@ -22,7 +22,7 @@ m3 = m2 - nim(m2);
 m4 = m3 - nim(m3);
 m5 = m4 - nim(m4);
 ";
-            var env = new Interpreter.Environment();
+            var env = new Interpreter.Environment.DefaultEnvironment();
             var block = Parser.Parser.ParseCode(source);
             env.Execute(block);
             Assert(((Interpreter.IntegralValue)env.GlobalScope["m1"]).value == 20);
