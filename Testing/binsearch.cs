@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Interpreter.Value;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -47,7 +48,7 @@ k = binfind(nums, 10, 70);
             var env = new Interpreter.Environment.DefaultEnvironment();
             var block = Parser.Parser.ParseCode(source);
             env.Execute(block);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["k"]).value == 7);
+            Assert(((IntegralValue)env.GlobalScope["k"]).Value == 7);
         }
     }
 }

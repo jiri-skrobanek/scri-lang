@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Interpreter.Value;
 
 namespace Testing
 {
@@ -25,11 +26,11 @@ f4 = fib(4);
             var env = new Interpreter.Environment.DefaultEnvironment();
             var block = Parser.Parser.ParseCode(source);
             env.Execute(block);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["f0"]).value == 0);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["f1"]).value == 1);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["f2"]).value == 1);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["f3"]).value == 2);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["f4"]).value == 3);
+            Assert(((IntegralValue)env.GlobalScope["f0"]).Value == 0);
+            Assert(((IntegralValue)env.GlobalScope["f1"]).Value == 1);
+            Assert(((IntegralValue)env.GlobalScope["f2"]).Value == 1);
+            Assert(((IntegralValue)env.GlobalScope["f3"]).Value == 2);
+            Assert(((IntegralValue)env.GlobalScope["f4"]).Value == 3);
         }
     }
 }

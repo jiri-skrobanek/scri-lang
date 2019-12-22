@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Interpreter.Value;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -25,9 +26,9 @@ m5 = m4 - nim(m4);
             var env = new Interpreter.Environment.DefaultEnvironment();
             var block = Parser.Parser.ParseCode(source);
             env.Execute(block);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["m1"]).value == 20);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["m3"]).value == 16);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["m5"]).value == 12);
+            Assert(((IntegralValue)env.GlobalScope["m1"]).Value == 20);
+            Assert(((IntegralValue)env.GlobalScope["m3"]).Value == 16);
+            Assert(((IntegralValue)env.GlobalScope["m5"]).Value == 12);
         }
     }
 }

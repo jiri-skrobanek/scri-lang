@@ -1,8 +1,6 @@
 ﻿using Interpreter.Environment;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using NameCollection = System.Collections.Generic.Dictionary<string, Interpreter.IValue>;
+using Interpreter.Value;
+using NameCollection = System.Collections.Generic.Dictionary<string, Interpreter.Value.IValue>;
 
 namespace Interpreter
 {

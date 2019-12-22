@@ -9,6 +9,9 @@ namespace Interpreter.Environment
         public string Name { get; protected set; }
     }
 
+    /// <summary>
+    /// Provides a convenient way to call .NET methods from interpreter.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     class BuiltinFunction : Builtin
     {        
@@ -18,7 +21,10 @@ namespace Interpreter.Environment
         }
     }
 
-    [AttributeUsage(AttributeTargets.Property)]
+    /// <summary>
+    /// Provides a convenient way to pass variables to the interpreter, this binding is one-way.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
     class BuiltinVariable : Builtin
     {
         public BuiltinVariable(string Name)

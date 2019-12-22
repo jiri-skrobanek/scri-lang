@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Interpreter.Value;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -27,9 +28,9 @@ c = max(a, b + 9);
             var env = new Interpreter.Environment.DefaultEnvironment();
             var block = Parser.Parser.ParseCode(source);
             env.Execute(block);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["a"]).value == 6);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["b"]).value == -2);
-            Assert(((Interpreter.IntegralValue)env.GlobalScope["c"]).value == 7);
+            Assert(((IntegralValue)env.GlobalScope["a"]).Value == 6);
+            Assert(((IntegralValue)env.GlobalScope["b"]).Value == -2);
+            Assert(((IntegralValue)env.GlobalScope["c"]).Value == 7);
         }
     }
 }

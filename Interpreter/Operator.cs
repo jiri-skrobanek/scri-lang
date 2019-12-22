@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using OpDict = System.Collections.Generic.Dictionary<(Interpreter.OperatorType, Interpreter.ValueKind?, Interpreter.ValueKind?), Interpreter.OperatorApplication>;
+using Interpreter.Value;
+using OpDict = System.Collections.Generic.Dictionary<(Interpreter.OperatorType, Interpreter.Value.ValueKind?, Interpreter.Value.ValueKind?), Interpreter.OperatorApplication>;
 
 namespace Interpreter
 {
@@ -44,7 +45,7 @@ namespace Interpreter
             // Unary Integral Operators:
 
             [(OperatorType.Plus, null, ValueKind.Integral)] = (x, y) => { return y; },
-            [(OperatorType.Minus, null, ValueKind.Integral)] = (x, y) => { return (IntegralValue)(-((IntegralValue)y).value); },
+            [(OperatorType.Minus, null, ValueKind.Integral)] = (x, y) => { return (IntegralValue)(-((IntegralValue)y).Value); },
 
             // Equality operators for other:
 

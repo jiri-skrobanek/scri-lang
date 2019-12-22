@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Reflection;
+using Interpreter.Value;
 
 namespace Interpreter.Environment
 {
@@ -13,18 +14,23 @@ namespace Interpreter.Environment
     {
         public DefaultEnvironment()
         {
+            var dictionary = new Dictionary<string, IValue>();
+
+            foreach (var method in ExtractMethods()) dictionary.Add(method.Name, method.Value);
+            foreach (var variable in ExtractVariables()) dictionary.Add(variable.Name, variable.Value);
+
             GlobalScope = new Scope(this)
             {
-                Names = ExtractMethods()
+                Names = dictionary
             };
         }
 
-        private Dictionary<string, IValue> ExtractMethods()
+        private IEnumerable<(string Name, IValue Value)> ExtractMethods()
         {
             var methods = this.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-            var builtins = methods.Where(x => isBuiltinMethod(x)).ToArray();
+            var builtins = methods.Where(x => isBuiltinMethod(x));
 
-            var methodDictionary = new Dictionary<string, IValue>();
+            var methodList = new List<(string Name, IValue Value)>();
 
             foreach (var b in builtins)
             {
@@ -33,21 +39,42 @@ namespace Interpreter.Environment
                 {
                     Invocation inv = (Invocation)Delegate.CreateDelegate(typeof(Invocation), b);
 
-                    methodDictionary.Add(info.Name, new Interpreter.BuiltinFunction(inv));
+                    methodList.Add((info.Name, new Value.BuiltinFunction(inv)));
                 }
             }
 
-            return methodDictionary;
+            return methodList;
 
             static bool isBuiltinMethod(MethodInfo method)
             {
                 var pars = method.GetParameters();
                 if (pars.Length != 2) return false;
                 if (pars[0].ParameterType != typeof(IList<IValue>)) return false;
-                if (pars[1].ParameterType.FullName != "Interpreter.IValue&") return false;
+                if (pars[1].ParameterType.FullName != typeof(Interpreter.Value.IValue).FullName + "&") return false;
                 
                 return pars[1].IsOut;
             }
+        }
+
+        private IEnumerable<(string Name, IValue Value)> ExtractVariables()
+        {
+            var variables = this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+
+            var varList = new List<(string Name, IValue Value)>();
+
+            foreach (var b in variables)
+            {
+                if (typeof(IValue).IsAssignableFrom(b.FieldType))
+                {
+                    var info = b.GetCustomAttribute<BuiltinVariable>();
+                    if (info != null)
+                    {
+                        varList.Add((info.Name, (IValue)b.GetValue(this)));
+                    }
+                }
+            }
+
+            return varList;
         }
 
         public delegate void PrintDirective(string Text);
@@ -84,10 +111,10 @@ namespace Interpreter.Environment
         {
             if (Args.Count >= 1 && Args[1] is IntegralValue iv)
             {
-                if (iv.value > 255 || iv.value < 0) { result = new None(); }
+                if (iv.Value > 255 || iv.Value < 0) { result = new None(); }
                 else
                 {
-                    result = new CharValue((char)iv.value);
+                    result = new CharValue((char)iv.Value);
                 }
             }
             else
@@ -116,5 +143,8 @@ namespace Interpreter.Environment
         }
 
         #endregion Build-in functions
+
+        [BuiltinVariable("version")]
+        private static IntegralValue version = new IntegralValue(1); 
     }
 }

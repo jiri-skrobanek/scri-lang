@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Interpreter.Value;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Interpreter.Environment
@@ -15,7 +16,7 @@ namespace Interpreter.Environment
             stream = fileStream;
             if (fileStream.CanRead)
             {
-                GlobalScope["read"] = new Interpreter.BuiltinFunction(getChar);
+                GlobalScope["read"] = new Interpreter.Value.BuiltinFunction(getChar);
             }
             if (fileStream.CanWrite)
             {
