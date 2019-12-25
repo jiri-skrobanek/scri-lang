@@ -88,7 +88,7 @@ namespace Parser
             }
             else
             {
-                throw new Exception("Invalid character value.");
+                throw new SyntaxError("Invalid character value.");
             }
         }
 

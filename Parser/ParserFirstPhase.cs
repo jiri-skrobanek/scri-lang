@@ -51,7 +51,7 @@ namespace Parser
                     {
                         if (statement.Count == 0)
                         {
-                            throw new Exception("Empty statement");
+                            throw new SyntaxError("Empty statement");
                         }
 
                         index++;
@@ -82,7 +82,7 @@ namespace Parser
                     {
                         if (current.Count == 0)
                         {
-                            throw new Exception("Empty statement");
+                            throw new SyntaxError("Empty statement");
                         }
 
                         content.Add(current);
@@ -98,7 +98,7 @@ namespace Parser
                         }
                         else
                         {
-                            throw new Exception("Missing statement terminator.");
+                            throw new SyntaxError("Missing statement terminator.");
                         }
                     }
                     else
@@ -106,7 +106,7 @@ namespace Parser
                         current.Add(Tokens[index]);
                     }
                 }
-                throw new Exception("Unbalanced brackets");
+                throw new SyntaxError("Unbalanced brackets");
             }
 
             static IList<IList<IToken>> split_by_commas(IList<IToken> tokens)
@@ -119,7 +119,7 @@ namespace Parser
                     {
                         if(current.Count == 0)
                         {
-                            throw new Exception("Null expression");
+                            throw new SyntaxError("Null expression");
                         }
                         else
                         {
@@ -134,7 +134,7 @@ namespace Parser
                 }
                 if (current.Count == 0 && result.Count > 0)
                 {
-                    throw new Exception("Null expression");
+                    throw new SyntaxError("Null expression");
                 }
                 else if(current.Count > 0)
                 {

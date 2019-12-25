@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Interpreter.Value
@@ -11,11 +12,19 @@ namespace Interpreter.Value
 
         public Invocation Call => _call;
 
+        public int Length => items.Count;
+
         void _call(IList<IValue> Args, out IValue result)
         {
             var len = Args.Count;
-            if (len == 1)
+            if(len == 0)
             {
+                // Return the set of keys.
+                result = new Vector(items.Keys.ToList());
+            }
+            else if (len == 1)
+            {
+                // Return item with this key.
                 if (Args[0] is IntegralValue)
                 {
                     if (items.ContainsKey(Args[1]))
@@ -34,6 +43,7 @@ namespace Interpreter.Value
             }
             else if (len == 2)
             {
+                // Set this value for this key.
                 result = new None();
                 if (Args[1] is None)
                 {

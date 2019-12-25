@@ -27,12 +27,12 @@ namespace Parser
                             "break" => new BreakStatement(),
                             "continue" => new ContinueStatement(),
                             "return" => new ReturnStatement { Expression = new ConstantExpression { value = new None() } },
-                            _ => throw new Exception("Invalid statement")
+                            _ => throw new SyntaxError("Invalid statement")
                         };
                     }
                     else
                     {
-                        throw new Exception("Invalid statement");
+                        throw new SyntaxError("Invalid statement");
                     }
                 }
             }
@@ -51,7 +51,7 @@ namespace Parser
                         tokens.RemoveAt(0);
                         return new PrintStatement(MakeExpression(tokens));
                     default:
-                        throw new Exception("Invalid statement");
+                        throw new SyntaxError("Invalid statement");
                 }
             }
             else if (tokens[1] is OperatorToken op)
@@ -66,7 +66,7 @@ namespace Parser
                 }
                 else
                 {
-                    throw new Exception("Invalid statement");
+                    throw new SyntaxError("Invalid statement");
                 }
             }
             else if (tokens[1] is ArgVector && tokens[0] is CustomWord)
@@ -75,7 +75,7 @@ namespace Parser
             }
             else
             {
-                throw new Exception("Unrecognized statement patterns");
+                throw new SyntaxError("Unrecognized statement patterns");
             }
         }
 
@@ -88,7 +88,7 @@ namespace Parser
         {
             if (tokens.Count == 0)
             {
-                throw new Exception("Void expression");
+                throw new SyntaxError("Void expression");
             }
             if (tokens.Count == 1)
             {
@@ -100,7 +100,7 @@ namespace Parser
                 {
                     if (av.List.Count != 1)
                     {
-                        throw new Exception("Invalid expression");
+                        throw new SyntaxError("Invalid expression");
                     }
                     return MakeExpression(av.List.First());
                 }
@@ -120,12 +120,12 @@ namespace Parser
                     }
                     else
                     {
-                        throw new Exception("Invalid expression");
+                        throw new SyntaxError("Invalid expression");
                     }
                 }
                 else
                 {
-                    throw new Exception("Invalid expression");
+                    throw new SyntaxError("Invalid expression");
                 }
             }
             else
@@ -169,7 +169,7 @@ namespace Parser
                         {
                             if(arg.Count == 0)
                             {
-                                throw new Exception("Invalid expression");
+                                throw new SyntaxError("Invalid expression");
                             }
                             var r_expr = split_by_operator(arg, priority - 100);
                             left_expression = new OperatorEvaluation { left_arg = left_expression, right_arg = r_expr, @operator = type };
@@ -182,7 +182,7 @@ namespace Parser
                 }
                 if (arg.Count == 0)
                 {
-                    throw new Exception("Invalid expression");
+                    throw new SyntaxError("Invalid expression");
                 }
                 return new OperatorEvaluation
                 {
@@ -206,7 +206,7 @@ namespace Parser
                         }
                         else
                         {
-                            throw new Exception("Invalid expression");
+                            throw new SyntaxError("Invalid expression");
                         }
                     }
                 }
@@ -228,7 +228,7 @@ namespace Parser
             }
             else
             {
-                throw new Exception("Invalid function definition");
+                throw new SyntaxError("Invalid function definition");
             }
 
             static List<string> extract_args(ArgVector vector)
@@ -242,7 +242,7 @@ namespace Parser
                     }
                     else
                     {
-                        throw new Exception("Invalid argument naming in function definition");
+                        throw new SyntaxError("Invalid argument naming in function definition");
                     }
                 }
                 return names;
@@ -260,7 +260,7 @@ namespace Parser
             }
             else
             {
-                throw new Exception("Invalid assignment");
+                throw new SyntaxError("Invalid assignment");
             }
         }
 
@@ -277,7 +277,7 @@ namespace Parser
             }
             else
             {
-                throw new Exception("Invalid function call");
+                throw new SyntaxError("Invalid function call");
             }
         }
 
@@ -290,12 +290,12 @@ namespace Parser
             {
                 if (rw.Word != "then")
                 {
-                    throw new Exception("No then in conditional statement");
+                    throw new SyntaxError("No then in conditional statement");
                 }
             }
             else
             {
-                throw new Exception("No then in conditional statement");
+                throw new SyntaxError("No then in conditional statement");
             }
             if (tokens.Count > condition.Count + 2 && tokens[condition.Count + 2] is BracketContent bc)
             {
@@ -303,7 +303,7 @@ namespace Parser
             }
             else
             {
-                throw new Exception("No code to execute in conditional statement when condition succeeds");
+                throw new SyntaxError("No code to execute in conditional statement when condition succeeds");
             }
             if (tokens.Count > condition.Count + 3)
             {
@@ -311,7 +311,7 @@ namespace Parser
                 {
                     if (rw2.Word != "else")
                     {
-                        throw new Exception("Else or end of statement was expected");
+                        throw new SyntaxError("Else or end of statement was expected");
                     }
                     else if (tokens.Count == condition.Count + 5 && tokens[condition.Count + 4] is BracketContent bc2)
                     {
@@ -319,12 +319,12 @@ namespace Parser
                     }
                     else
                     {
-                        throw new Exception("No code to execute in conditional statement when condition fails");
+                        throw new SyntaxError("No code to execute in conditional statement when condition fails");
                     }
                 }
                 else
                 {
-                    throw new Exception("Else or end of statement was expected");
+                    throw new SyntaxError("Else or end of statement was expected");
                 }
             }
             else
@@ -343,12 +343,12 @@ namespace Parser
             {
                 if (rw.Word != "do")
                 {
-                    throw new Exception("No do in loop statement");
+                    throw new SyntaxError("No do in loop statement");
                 }
             }
             else
             {
-                throw new Exception("No do in conditional statement");
+                throw new SyntaxError("No do in conditional statement");
             }
             if (tokens.Count > condition.Count + 2 && tokens[condition.Count + 2] is BracketContent bc)
             {
@@ -356,7 +356,7 @@ namespace Parser
             }
             else
             {
-                throw new Exception("No code to execute in loop statement when condition succeeds");
+                throw new SyntaxError("No code to execute in loop statement when condition succeeds");
             }
             return new WhileLoop { block = satisfied, condition = expression };
         }

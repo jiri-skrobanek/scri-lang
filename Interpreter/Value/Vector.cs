@@ -14,6 +14,8 @@ namespace Interpreter.Value
             items.AddRange(Args);
         }
 
+        public int Length => items.Count;
+
         public Invocation Call => _call;
 
         void _call(IList<IValue> Args, out IValue result)

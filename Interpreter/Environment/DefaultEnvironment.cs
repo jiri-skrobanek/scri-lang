@@ -106,6 +106,17 @@ namespace Interpreter.Environment
             result = new Map();
         }
 
+        [BuiltinFunction("length")]
+        protected static void getLength(IList<IValue> Args, out IValue result)
+        {
+            result = Args switch
+            {
+                Vector v => new IntegralValue(v.Length),
+                Map m => new IntegralValue(m.Length),
+                _ => new None()
+            };
+        }
+
         [BuiltinFunction("char")]
         protected static void makeChar(IList<IValue> Args, out IValue result)
         {
