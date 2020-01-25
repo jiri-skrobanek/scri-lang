@@ -31,14 +31,7 @@ namespace Interpreter.Environment
         private void getChar(IList<IValue> Args, out IValue result)
         {
             var b = stream.ReadByte();
-            if (b == -1)
-            {
-                result = new None();
-            }
-            else
-            {
-                result = new CharValue();
-            }
+            result = (b == -1) ? (IValue)new None() : new CharValue((char)b);
         }
 
         /// <summary>

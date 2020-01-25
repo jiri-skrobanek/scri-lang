@@ -57,15 +57,15 @@ namespace Interpreter
             {
                 var result = block.Execute(scope);
 
-                if (result.GetType() == typeof(BreakResult))
+                if (result is BreakResult)
                 {
                     break;
                 }
-                else if (result.GetType() == typeof(ContinueResult))
+                else if (result is ContinueResult)
                 {
                     continue;
                 }
-                else if (result.GetType() == typeof(ReturnResult))
+                else if (result is ReturnResult)
                 {
                     return result;
                 }
