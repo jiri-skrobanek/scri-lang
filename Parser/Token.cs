@@ -62,9 +62,7 @@ namespace Parser
             }
         }
 
-        protected string _word;
-        public string Word
-        { get { return _word; } }
+        public string Word { get; protected set; }
     }
 
     internal class NumericConstant : IToken
@@ -99,7 +97,7 @@ namespace Parser
     {
         public ReservedWord(string word)
         {
-            _word = word;
+            Word = word;
         }
 
         public static bool IsReserved(string Word)
@@ -127,7 +125,7 @@ namespace Parser
     {
         public CustomWord(string word)
         {
-            this._word = word;
+            Word = word;
         }
     }
 
