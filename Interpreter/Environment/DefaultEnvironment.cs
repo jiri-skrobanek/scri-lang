@@ -37,7 +37,9 @@ namespace Interpreter.Environment
                 var info = b.GetCustomAttribute<BuiltinFunction>();
                 if (info != null)
                 {
-                    Invocation inv = (Invocation)Delegate.CreateDelegate(typeof(Invocation), b);
+                    Invocation inv = b.IsStatic 
+                        ? (Invocation)Delegate.CreateDelegate(typeof(Invocation), b)
+                        : (Invocation)Delegate.CreateDelegate(typeof(Invocation), this, b);
 
                     methodList.Add((info.Name, new Value.BuiltinFunction(inv)));
                 }

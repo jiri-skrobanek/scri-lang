@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Interpreter.Environment
 {
-    class Builtin : Attribute
+    public class Builtin : Attribute
     {
         public string Name { get; protected set; }
     }
@@ -13,7 +13,7 @@ namespace Interpreter.Environment
     /// Provides a convenient way to call .NET methods from interpreter.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    class BuiltinFunction : Builtin
+    public class BuiltinFunction : Builtin
     {        
         public BuiltinFunction(string Name)
         {
@@ -25,7 +25,7 @@ namespace Interpreter.Environment
     /// Provides a convenient way to pass variables to the interpreter, this binding is one-way.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    class BuiltinVariable : Builtin
+    public class BuiltinVariable : Builtin
     {
         public BuiltinVariable(string Name)
         {
