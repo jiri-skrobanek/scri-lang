@@ -1,0 +1,6 @@
+i = 0;
+while move_next() ! goal do 
+(
+    i = i + 1;
+);
+set_result(i);

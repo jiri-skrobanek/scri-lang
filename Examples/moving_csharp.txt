@@ -1,0 +1,25 @@
+private class ValueIteratingEnvironment : DefaultEnvironment
+{
+    [BuiltinVariable("goal")]
+    public IntegralValue goal = 2047;
+
+    public int current = 1;
+
+    [Interpreter.Environment.BuiltinFunction("move_next")]
+    public void MoveNext(IList<IValue> args, out IValue result)
+    {
+        current *= 4; current += 3;
+        result = (IntegralValue) current;
+    }
+
+    public int result = 0;
+
+    [Interpreter.Environment.BuiltinFunction("set_result")]
+    public void SetResult(IList<IValue> args, out IValue result)
+    {
+        if (args.Count != 1) throw new ArgumentException();
+        if (args[0] is IntegralValue i) this.result = i;
+        else throw new ArgumentException();
+        result = new None();
+    }
+}

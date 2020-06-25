@@ -13,6 +13,7 @@ namespace Testing
             TestNim();
             TestFib();
             TestBinsearch();
+            TestMoving();
         }
 
         static void Assert(bool b)

@@ -253,7 +253,7 @@ The \texttt{[EXPRESSION]} expression will be evaluated and printed to the output
 
 \section{Undefined behavior}
 
-Should the code not comply with this specification, its execution will either produce error upon parsing, execution, or the interpreter will behave in an unpredictable way.
+Should the code not comply with this specification, its execution will either produce error upon parsing, execution, or the interpreter will behave in an unpredictable way. For majority of cases, there is an exception produced by the parser.
 
 \section{Examples}
 The following function returns the maximum of two integers:
@@ -265,4 +265,12 @@ The following function conducts a binary search in a sorted list of integers and
 \lstinputlisting{../Examples/binarysearch.txt}
 The following function received a natural number and returns the Fibonacci number with that index. The suboptimal recursive algorithm is used to demonstrate recursion capability.
 \lstinputlisting{../Examples/fibonacci.txt}
+
+Let us now assume that we want to supply the global scope with additional methods. We can extend \texttt{DefaultNamespace} class and provide C\# method implementations for these methods. See below.
+\lstinputlisting[language={[Sharp]C}]{../Examples/moving_csharp.txt}
+Here we see how this could be used.
+\lstinputlisting{../Examples/moving_script.txt}
+This script calculates the number of values obtained by calling \texttt{move\_next} before \texttt{goal}. 
+
+One important thing to note is, that variables are bound only once and their value will not be synchronized. Use getters or setters if synchronization is intended.
 \end{document}
