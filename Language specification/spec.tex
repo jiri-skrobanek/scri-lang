@@ -18,7 +18,7 @@
 \begin{document}
 \begin{center}
 \pagenumbering{arabic}
-{\huge \textbf{Language Specification}}\\
+{\huge \textbf{Interpreted Scripting Language Specification}}\\
 \vspace{10mm} {\large Jiří Škrobánek\footnote[1]{Faculty of Mathematics and Physics, Charles University, Prague, {\ttfamily jiri@skrobanek.cz}}}\\
 \vspace{10mm}\today, Ostrava
 \end{center}
@@ -26,6 +26,9 @@
 \section*{Introduction}
 	
 This document specifies all the syntax and semantics of this interpreted language. Some trivial examples are provided to illustrate it.
+
+The overall goal of this project was to create a simple scripting language to be used for user components in .NET applications. 
+For example it is possible to implement behavior logic of some intelligent agents in this language. Author of the logic would not need to understand other concepts of .NET or C\#.
 	
 \tableofcontents
 
@@ -268,7 +271,7 @@ The following function received a natural number and returns the Fibonacci numbe
 
 Let us now assume that we want to supply the global scope with additional methods. We can extend \texttt{DefaultNamespace} class and provide C\# method implementations for these methods. See below.
 \lstinputlisting[language={[Sharp]C}]{../Examples/moving_csharp.txt}
-Here we see how this could be used.
+Reflection is used to extract builtin methods and variables from environment. Here we see how this could be used.
 \lstinputlisting{../Examples/moving_script.txt}
 This script calculates the number of values obtained by calling \texttt{move\_next} before \texttt{goal}. 
 

@@ -8,13 +8,13 @@ namespace Parser
 {
     public static partial class Parser
     {
-        private static Block MakeBlock(BracketContent content)
+        internal static Block MakeBlock(BracketContent content)
         {
             var statements = from x in content.StatementList select MakeStatement(x);
             return new Block { statements = statements.ToArray() };
         }
 
-        private static Statement MakeStatement(IList<IToken> tokens)
+        internal static Statement MakeStatement(IList<IToken> tokens)
         {
             if (tokens.Count == 1)
             {
@@ -84,7 +84,7 @@ namespace Parser
             return (from item in items select MakeExpression(item)).ToList();
         }
 
-        private static IExpression MakeExpression(IList<IToken> tokens)
+        internal static IExpression MakeExpression(IList<IToken> tokens)
         {
             if (tokens.Count == 0)
             {

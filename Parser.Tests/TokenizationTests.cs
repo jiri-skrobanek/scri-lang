@@ -16,7 +16,7 @@ namespace Parser.Tests
             Assert.AreEqual(tokens[2].GetType(), typeof(NumericConstant));
             Assert.AreEqual(tokens[3].GetType(), typeof(OperatorToken));
             Assert.AreEqual(tokens[4].GetType(), typeof(NumericConstant));
-            Assert.AreEqual(tokens[4].GetType(), typeof(StatementTerminator));
+            Assert.AreEqual(tokens[5].GetType(), typeof(StatementTerminator));
         }
 
         [TestMethod]
