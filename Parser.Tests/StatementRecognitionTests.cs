@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Interpreter.Value;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 
 namespace Parser.Tests
@@ -60,6 +62,65 @@ namespace Parser.Tests
             };
 
             Assert.AreEqual(Parser.MakeStatement(tokens).GetType(), typeof(Interpreter.ReturnStatement));
+        }
+
+        [TestMethod]
+        public void TestCallValid()
+        {
+            var tokens = new List<IToken> {
+                new CustomWord("foo"),
+                new ArgVector(){ List = new List<IList<IToken>>{ new List<IToken>{
+                new CustomWord("x") } } }
+            };
+
+            Assert.AreEqual(Parser.MakeStatement(tokens).GetType(), typeof(Interpreter.CallStatement));
+        }
+
+        [TestMethod]
+        public void TestCallInvalid()
+        {
+            var tokens = new List<IToken> {
+                new CustomWord("foo"),
+                new ArgVector(),
+                new CustomWord("foo")
+            };
+
+            Assert.ThrowsException<SyntaxError>(() => Parser.MakeStatement(tokens));
+        }
+
+        [TestMethod]
+        public void TestFunctionValid()
+        {
+            var tokens = new List<IToken> {
+                new CustomWord("foo"),
+                new OperatorToken('@'),
+                new ArgVector(){ List = new List<IList<IToken>>{ new List<IToken>{
+                new CustomWord("x") } } },
+                new BracketContent(){ StatementList = new List<IList<IToken>>{ new List<IToken>{
+                new ReservedWord("return"),
+                new CustomWord("x") } } }
+            };
+
+            Assert.AreEqual(Parser.MakeStatement(tokens).GetType(), typeof(Interpreter.FunctionDefinition));
+        }
+
+        [TestMethod]
+        public void TestFunctionInvalid()
+        {
+            var tokens = new List<IToken> {
+                new CustomWord("foo"),
+                new OperatorToken('@'),
+                new ArgVector(){ List = new List<IList<IToken>>{ new List<IToken>{
+                new CustomWord("x") } } },
+                new BracketContent(){ StatementList = new List<IList<IToken>>{ new List<IToken>{
+                new ReservedWord("return"),
+                new CustomWord("x") } } },
+                new BracketContent(){ StatementList = new List<IList<IToken>>{ new List<IToken>{
+                new ReservedWord("return"),
+                new CustomWord("x") } } }
+            };
+
+            Assert.ThrowsException<SyntaxError>(() => Parser.MakeStatement(tokens));
         }
 
         [TestMethod]

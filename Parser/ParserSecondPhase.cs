@@ -1,6 +1,5 @@
 ﻿using Interpreter;
 using Interpreter.Value;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -216,7 +215,10 @@ namespace Parser
 
         private static Interpreter.FunctionDefinition MakeFunctionDefinition(IList<IToken> tokens)
         {
-
+            if(tokens.Count != 4)
+            {
+                throw new SyntaxError("Invalid function definition");
+            }
             if (tokens[0] is CustomWord cw && tokens[2] is ArgVector av && tokens[3] is BracketContent bc)
             {
                 var fc = new FunctionCall
@@ -266,6 +268,10 @@ namespace Parser
 
         private static CallStatement MakeCallStatement(IList<IToken> tokens)
         {
+            if(tokens.Count != 2)
+            {
+                throw new SyntaxError("Invalid statement");
+            }
             if (tokens[0] is CustomWord cw && tokens[1] is ArgVector av)
             {
                 var fc = new FunctionCall
