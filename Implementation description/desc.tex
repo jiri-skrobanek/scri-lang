@@ -18,9 +18,11 @@
 	
 \section*{Introduction}
 	
-This document briefly describes the usage and implementation of parser and interpreter for scripting language specified in corresponding Language Specification document. Both parser and interpreter are implemented in C\# 8.0 and .NET Core, the latest version uses .NET Core 3.1. For more information about particular features comments in the source code may be seen.
+This document briefly describes the usage and implementation of parser and interpreter for scripting language specified in corresponding \textit{Language Specification} document. Both parser and interpreter are implemented in C\# 8.0 and .NET Core, the latest version uses .NET Core 3.1. For more information about particular features the source code and comments in it may be seen.
 
-This project is maintained at \texttt{https://github.com/jiri-skrobanek/scri-lang.git}.
+The overall structure comprises of four projects: Parser, Interpreter, unit-tests for Parser and larger tests. Dynamically linked library is the output.
+
+This project is maintained at \texttt{https://github.com/jiri-skrobanek/scri-lang.git}. The work can be used under the terms of MIT License.
 
 \section*{Parser}
 
@@ -32,7 +34,9 @@ Once tokenization is complete, the list of tokens is split into statements and a
 
 Expressions are created recursively, operators are found by their priority in descending order ending with function calls. Once all operators of the highest priority are found, should their arguments still be composed expressions, operators of lower priority are found, this process is repeated for all priority levels.
 
-The conversion from text to binary representation is linear in time complexity with the length of the text. This is possible thanks to the language having context-free grammar.
+The source code is therefore represented with CLR objects. It is also possible to create 
+
+The conversion from text to binary representation is linear in time complexity with the length of the text. This is possible thanks to the language having a context-free grammar.
 	
 \section*{Interpreter}
 
@@ -41,5 +45,17 @@ The interpreter receives binary representation of a program (either produced by 
 Classes exist for features of the language such as statements, expressions, values. Subtypes of these features have their own descendant classes. With this design, the language should be easily extensible, exempli gratia floating point arithmetic could be added if needed.
 
 The program is executed inside an environment which provides special global built-in functions and variables. Built-ins can be defined inside the environment as .NET methods and fields, if annotated by Built-in attributes, these items are exported into the global scope of the interpreter.
+
+\section*{Tests}
+
+There are some end-to-end tests which start from source code and check the results of the computation. All main features are tested.
+
+Additionally for parser, some unit-tests were created.
+
+\section*{Further Documentation}
+
+Usage can be easily deduced from larger examples in Testing project.
+
+It is the opinion of the author that excessive comments are oftentimes counterproductive, hence only main classes and methods have XML descriptions. Everyone using this library should have access to the source code and sufficient knowledge of software engineering to comprehend it, in spite of that the author decided that further documentation would be of no avail.
 
 \end{document}
